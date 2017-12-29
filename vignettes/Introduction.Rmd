@@ -1,0 +1,202 @@
+---
+title: "Introduction to FaithLabTools"
+author: "Eduardo Contijoch"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r load kable, message=FALSE, warning=FALSE, include=FALSE}
+require(kableExtra)
+require(knitr)
+options(knitr.table.format = "html") 
+
+```
+
+## Why use R?
+I've found that using a software like R has been immensely helpful in lab. The way I see it, it comes with two big advantages to doing things by hand. First, it _can_ drastically reduce the time to do things while simultaneously reducing the chances of making an error. There are inevitably going to be tasks that you find yourself doing over and over again (e.g. measuring DNA concentrations from samples with the plate reader). By investing some time up front to automate that process (and set it up well), you can then sit back and let the computer do the work and know that it won't make any mistakes. The one caveat here is that it might take a lot of time to get your function to work and work reliably, so there's a bit of a balance. Also, if you make a mistake in setting up your function, it will be carried through every time you use it later. The second big advantage is that since the files are all digital and most data analysis scripts are relatively small, you can essentially use your collection of scripts (that naturally come with timestamps) as a rough draft of a lab notebook. By making a new file for every new set of data you're crunching, you have a digital record of what you've done. 
+
+An additional perk of using R is that by now, there are a wealth of packages out there that can let you do pretty much anything you will want with your data (except, notoriously, an easy way to make 3D plots). With the functions contained in this package, I'm hoping to further bridge the gap between lab-specific uses of R and the rest universe of data handling packages.
+
+## Helpful tools to get started
+If you need to get started with R, there are a few helpful resources available on the web. In general, if you look up whatever you are having trouble with, plus "R stats" on Google, you should find a decent answer within the first few results. But for getting started from scratch, I'll simply link to a couple of [helpful](http://www.sr.bham.ac.uk/~ajrs/R/why_R.html) [resources](http://swirlstats.com/students.html) I've come across. By no means are they the only ones available, and you might very well find another that is more helpful to you. One last very helpful resource is the ["tidyverse"](http://r4ds.had.co.nz). It is a set of R packages that are meant to work with each other to simplify most of the steps along the data analysis pipeline from reading data in, manipulating the data, and plotting it. It was developed and maintianed by Hadley Wickham, the chief scientist of [RStudio](https://www.rstudio.com), which is another tool that you'll want to get your hands on. 
+
+## Lab-specific functions within this package
+The purpose of this package is to put together a collection of (hopefully) broadly-applicable functions that can be used by some/most people in the lab. So what follows is a small description of each of the individual functions I've put into this package, and then some examples of workflows that utilize some or most of these functions.
+
+To use this package, install it from bitbucket. You will first have to install the devtools package:
+
+```{r install devtools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+install.packages('devtools')
+
+```
+
+Then, you can use the devtools package to install the FaithLabTools package:
+
+```{r install FaithLabTools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+devtools::install_bitbucket('econtijoch/FaithLab)
+
+```
+
+Next, you'll have to load the FaithLabTools package:
+
+```{r load FaithLabTools, message=FALSE, warning=FALSE, include=FALSE}
+require(FaithLabTools)
+
+## OR
+
+library(FaithLabTools)
+
+```
+
+Using either `require()` or `library()` works.
+
+
+### Generating example files to work with
+If you don't have any files to work with, or if you can't figure out why something isn't working, I've included a good number of files in this package that should be helpful. To generate these files in your computer, use the `make_example_files()` function. If you do not provide a directory, it will create the files in your current directory:
+
+```{r make example files, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+make_example_files(directory = '~/Desktop/example_directory')
+
+```
+
+```{r make example files - real, eval=TRUE, message=FALSE, warning=FALSE, include=FALSE}
+make_example_files()
+
+```
+
+I will refer to these files moving forward, so if you want to be able to replicate any of the steps, you can use these files as a guide.
+
+
+### Sample weighing using barcoded tubes
+A key aspect of measuring microbial density in fecal samples is to accurately mass each sample. To do this, we've developed a barcoding system to label and keep track of tubes as they are weighed using the digital scale. A key part of this is the [LabelMaker Spreadsheet](https://docs.google.com/spreadsheets/d/1ngMyWLLtBerwBpAPl713UGix9b-jHmzALFPLHiP7UY0/edit?usp=sharing) which makes barcodes for each sample. With these labels on the tubes, we can weigh each tube quickly and keep track of which tube is which. By weighing each tube before and after collecting a sample, we can calculate the mass of each sample. Since tubes can easily get shuffled around, the point of the `mass_and_order()` function is to use the barcodes to keep track of each sample, and to pair each full weight with the correct empty weight. We can use it to read in two sample mass files and get a sample mass output:
+
+```{r sample mass - basic, echo=TRUE, message=FALSE, warning=FALSE}
+sample_weights <- mass_and_order(empty_weights = 'Example_empty_weights.txt', full_weights = 'Example_full_weights.txt')
+```
+
+```{r view sample mass - basic, echo=FALSE, message=FALSE, warning=FALSE}
+kable(sample_weights) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+If you take a look at the example weight files (*Example_empty_weights.txt* and *Example_full_weights.txt*) you'll notice that in one of the two files, I have scanned BOTH the tube barcodes that are physically on the bottoms of the matrix tubes, as well as the LabelMaker-generated barcodes (which may be printed on the labels). By containing this information in either one of the empty or full barcode files, we can patch together that information so we can then add more meaningful information about our samples to our sample masses. 
+
+Another feature of this function is that by default, samples are put into the data frame in the order provided by the file containing full weights. This way, if you weigh your samples in the order in which you add them to a rack, you will have the samples in the correct order after using this function. 
+
+To get an even better sense of where each individual tube is, we can use the plate scanner from the Cho lab to give each of our samples a location within the 96-tube rack. If you have your samples in the Matrix tubes, and within the Matrix rack, you can scan your rack and export the .csv file to be used in this same function. By adding this file to our function, we can get a data frame that also includes sample location information:
+
+```{r sample mass - ordered, echo=TRUE, message=FALSE, warning=FALSE}
+sample_weights_and_location <- mass_and_order(empty_weights = 'Example_empty_weights.txt', full_weights = 'Example_full_weights.txt', order = 'Example_matrix_plate_scan.csv', plate_name = 'Example Plate')
+
+```
+
+```{r view sample mass - ordered, echo=FALSE, message=FALSE, warning=FALSE}
+kable(sample_weights_and_location) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+If you do not provide a plate name, it will return the plate name given from the plate scanner.
+
+### Reading in files with sample information
+If you have a file that contains more sample information that what is contained in the barcode, you can also read it in and join it with any other data. To do so, you can use the `read_sample_info()` function, which was written to be able to take in any type of tabular data (.csv OR excel), and load it into R. You can then join the data using the [dplyr package join functions](http://dplyr.tidyverse.org/reference/join.html) which should be loaded with the FaithLabTools package.
+
+```{r add sample info, echo=TRUE, message=FALSE, warning=FALSE}
+sample_information <- read_sample_info('Example_sampleInfo.csv')
+
+annotated_data <- left_join(sample_weights_and_location, sample_information)
+
+```
+
+```{r view samples annotated, echo=FALSE, message=FALSE, warning=FALSE}
+kable(annotated_data) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+This data can now be used to join with other data sources and to plot data according to any number of variables included in the sample information.
+
+### Reading plate reader files
+Whether you are using the plate reader to read an ELISA or DNA concentrations, you can use the general `read_plate()` function. The function is intended to read files from the plate reader directly (the raw excel file that it produces), and expects that the plate reader only makes one measurement per well:
+
+```{r read plate}
+plate_reader_data <- read_plate(plate_reader_file = 'Example_BR_raw.xlsx', plate_name = 'Example Plate')
+
+```
+
+The function also allows you to specify if you are using a 384-well plate by changing the _size_ parameter, but I haven't worked much with 384-well plates and the plate reader so it isn't as well tested as using a 96-well plate.
+
+### Measuring DNA concentrations
+For the specific case of measuring DNA concentrations using the qubit dyes (HS or BR), I've put together a function that will read in the plate reader file, compute a standard curve, and generate DNA concentrations for each sample. The `measure_dna_concentration()` function requires a lot more inputs than the previous ones, so I will describe them more in full:
+
+* *plate_reader_file* - path to the raw file from the plate reader
+* *standards_plate_reader_file* - path to the raw file from the plate reader that contains the standards information. If the standards are on the same plate that you want to measure, you can leave this out, since it defaults to the *plate_reader_file*
+* *standard_wells* - a vector of the wells that contain the standards, in increasing concentration order. These need to be in the 2-digit format (e.g. "A01", "B07", and NOT "A1", "B7"). 
+* *dye_used* - specify whether you measured DNA with the HS or BR dye. Must be wrapped in quotes.
+* *qubit_volume* - indicate how much DNA was used to measure the DNA (default = 2 uL)
+* *elution_volume* - indicate how much EB was used to elute the DNA (default = 100 uL)
+* *plate_size* - indicate plate size (default = 96, and honestly I haven't tried 384)
+* *plate_name* - a name for the plate, similar to examples above
+* *print_standard_curve* - TRUE or FALSE to indicate whether or not to print a plot of the standard curve
+
+```{r HS concentration, echo=TRUE, warning=FALSE}
+sample_HS_dna <- measure_dna_concentration(plate_reader_file = 'Example_HS_raw.xlsx', standards_plate_reader_file = 'Example_standards_raw.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 100, plate_size = 96, plate_name = 'Example Plate', print_standard_curve = TRUE)
+
+
+```
+
+```{r BR concentration, echo=TRUE, warning=FALSE}
+sample_BR_dna <- measure_dna_concentration(plate_reader_file = 'Example_BR_raw.xlsx', standards_plate_reader_file = 'Example_standards_raw.xlsx', standard_wells = c("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08"), dye_used = "BR", qubit_volume = 2, elution_volume = 100, plate_size = 96, plate_name = 'Example Plate', print_standard_curve = TRUE)
+
+
+```
+
+
+Qubit merger
+
+Manual microbial density
+
+automated microbial density
+
+
+
+### Making use of the Beckmann robot
+
+### Plotting data
+
+
+## Examples of workflows
+
+### High-throughput microbial density measurements
+Mass samples
+Read order from Cho lab
+DNA concentration
+Microbial density
+Plot
+
+### 16S sequencing prep
+DNA concentration
+Normalize
+Pool
+
+
+### Metagenomics sequencing prep
+DNA concentration
+Normalize
+Pool evenly
+

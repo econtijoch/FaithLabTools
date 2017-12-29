@@ -1,11 +1,12 @@
 #' Function to read in mapping file and tweak format so that it is friendly with the rest of the package functinos
 #' @param plate_reader_file Fluorescence data from the plate reader (can be in .csv or .xls(x) format -- if in excel file, only the FIRST sheet within the file will be read)
 #' @param size optional size of plate (96 or 384)
+#' @param plate_name optional name to giv ethe plate
 #' @return a list containing: 1) a data frame with the data from the plate reader file and 2) the number of measurements taken for each sample
 #' @export
 #'
 
-read_plate <- function(plate_reader_file, size = 96) {
+read_plate <- function(plate_reader_file, size = 96, plate_name = NA) {
 
 
   # Import file, handle xls(x) vs csv files
@@ -61,7 +62,9 @@ read_plate <- function(plate_reader_file, size = 96) {
   }
 
   # Remove NAs
-  final_table <- subset(newtable, !is.na(newtable$Measurement))
+  final_table <- subset(newtable, !is.na(newtable$Measurement)) %>%
+    dplyr::mutate(Plate = plate_name) %>%
+    dplyr::select(Plate, Well, Measurement)
 
   return(final_table)
 
