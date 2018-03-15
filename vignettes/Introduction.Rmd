@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r load kable, message=FALSE, warning=FALSE, include=FALSE}
+```{r load_kable, message=FALSE, warning=FALSE, include=FALSE}
 require(kableExtra)
 require(knitr)
 options(knitr.table.format = "html") 
@@ -36,21 +36,21 @@ The purpose of this package is to put together a collection of (hopefully) broad
 
 To use this package, install it from bitbucket. You will first have to install the devtools package:
 
-```{r install devtools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r install_devtools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 install.packages('devtools')
 
 ```
 
 Then, you can use the devtools package to install the FaithLabTools package:
 
-```{r install FaithLabTools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r install_FaithLabTools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 devtools::install_bitbucket('econtijoch/FaithLab)
 
 ```
 
 Next, you'll have to load the FaithLabTools package:
 
-```{r load FaithLabTools, message=FALSE, warning=FALSE, include=FALSE}
+```{r load_FaithLabTools, message=FALSE, warning=FALSE, include=FALSE}
 require(FaithLabTools)
 
 ## OR
@@ -65,12 +65,12 @@ Using either `require()` or `library()` works.
 ### Generating example files to work with
 If you don't have any files to work with, or if you can't figure out why something isn't working, I've included a good number of files in this package that should be helpful. To generate these files in your computer, use the `make_example_files()` function. If you do not provide a directory, it will create the files in your current directory:
 
-```{r make example files, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r make_example_files, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 make_example_files(directory = '~/Desktop/example_directory')
 
 ```
 
-```{r make example files - real, eval=TRUE, message=FALSE, warning=FALSE, include=FALSE}
+```{r make_example_files_real, eval=TRUE, message=FALSE, warning=FALSE, include=FALSE}
 make_example_files()
 
 ```
@@ -81,11 +81,11 @@ I will refer to these files moving forward, so if you want to be able to replica
 ### Sample weighing using barcoded tubes
 A key aspect of measuring microbial density in fecal samples is to accurately mass each sample. To do this, we've developed a barcoding system to label and keep track of tubes as they are weighed using the digital scale. A key part of this is the [LabelMaker Spreadsheet](https://docs.google.com/spreadsheets/d/1ngMyWLLtBerwBpAPl713UGix9b-jHmzALFPLHiP7UY0/edit?usp=sharing) which makes barcodes for each sample. With these labels on the tubes, we can weigh each tube quickly and keep track of which tube is which. By weighing each tube before and after collecting a sample, we can calculate the mass of each sample. Since tubes can easily get shuffled around, the point of the `mass_and_order()` function is to use the barcodes to keep track of each sample, and to pair each full weight with the correct empty weight. We can use it to read in two sample mass files and get a sample mass output:
 
-```{r sample mass - basic, echo=TRUE, message=FALSE, warning=FALSE}
+```{r sample_mass - basic, echo=TRUE, message=FALSE, warning=FALSE}
 sample_weights <- mass_and_order(empty_weights = 'Example_empty_weights.txt', full_weights = 'Example_full_weights.txt')
 ```
 
-```{r view sample mass - basic, echo=FALSE, message=FALSE, warning=FALSE}
+```{r view_sample_mass - basic, echo=FALSE, message=FALSE, warning=FALSE}
 kable(sample_weights) %>% 
   kable_styling() %>%
   scroll_box(height = '300px')
@@ -98,12 +98,12 @@ Another feature of this function is that by default, samples are put into the da
 
 To get an even better sense of where each individual tube is, we can use the plate scanner from the Cho lab to give each of our samples a location within the 96-tube rack. If you have your samples in the Matrix tubes, and within the Matrix rack, you can scan your rack and export the .csv file to be used in this same function. By adding this file to our function, we can get a data frame that also includes sample location information:
 
-```{r sample mass - ordered, echo=TRUE, message=FALSE, warning=FALSE}
+```{r sample_mass_ordered, echo=TRUE, message=FALSE, warning=FALSE}
 sample_weights_and_location <- mass_and_order(empty_weights = 'Example_empty_weights.txt', full_weights = 'Example_full_weights.txt', order = 'Example_matrix_plate_scan.csv', plate_name = 'Example Plate')
 
 ```
 
-```{r view sample mass - ordered, echo=FALSE, message=FALSE, warning=FALSE}
+```{r view_sample_mass_ordered, echo=FALSE, message=FALSE, warning=FALSE}
 kable(sample_weights_and_location) %>% 
   kable_styling() %>%
   scroll_box(height = '300px')
@@ -115,14 +115,14 @@ If you do not provide a plate name, it will return the plate name given from the
 ### Reading in files with sample information
 If you have a file that contains more sample information that what is contained in the barcode, you can also read it in and join it with any other data. To do so, you can use the `read_sample_info()` function, which was written to be able to take in any type of tabular data (.csv OR excel), and load it into R. You can then join the data using the [dplyr package join functions](http://dplyr.tidyverse.org/reference/join.html) which should be loaded with the FaithLabTools package.
 
-```{r add sample info, echo=TRUE, message=FALSE, warning=FALSE}
+```{r add_sample_info, echo=TRUE, message=FALSE, warning=FALSE}
 sample_information <- read_sample_info('Example_sampleInfo.csv')
 
 annotated_data <- left_join(sample_weights_and_location, sample_information)
 
 ```
 
-```{r view samples annotated, echo=FALSE, message=FALSE, warning=FALSE}
+```{r view_samples_annotated, echo=FALSE, message=FALSE, warning=FALSE}
 kable(annotated_data) %>% 
   kable_styling() %>%
   scroll_box(height = '300px')
@@ -134,8 +134,15 @@ This data can now be used to join with other data sources and to plot data accor
 ### Reading plate reader files
 Whether you are using the plate reader to read an ELISA or DNA concentrations, you can use the general `read_plate()` function. The function is intended to read files from the plate reader directly (the raw excel file that it produces), and expects that the plate reader only makes one measurement per well:
 
-```{r read plate}
+```{r read_plate}
 plate_reader_data <- read_plate(plate_reader_file = 'Example_BR_raw.xlsx', plate_name = 'Example Plate')
+
+```
+
+```{r view_read_plate, echo=FALSE, message=FALSE, warning=FALSE}
+kable(plate_reader_data) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
 
 ```
 
@@ -154,30 +161,101 @@ For the specific case of measuring DNA concentrations using the qubit dyes (HS o
 * *plate_name* - a name for the plate, similar to examples above
 * *print_standard_curve* - TRUE or FALSE to indicate whether or not to print a plot of the standard curve
 
-```{r HS concentration, echo=TRUE, warning=FALSE}
+```{r HS_concentration, echo=TRUE, message=FALSE, warning=FALSE}
 sample_HS_dna <- measure_dna_concentration(plate_reader_file = 'Example_HS_raw.xlsx', standards_plate_reader_file = 'Example_standards_raw.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 100, plate_size = 96, plate_name = 'Example Plate', print_standard_curve = TRUE)
 
 
 ```
 
-```{r BR concentration, echo=TRUE, warning=FALSE}
+```{r BR_concentration, echo=TRUE, message=FALSE, warning=FALSE}
 sample_BR_dna <- measure_dna_concentration(plate_reader_file = 'Example_BR_raw.xlsx', standards_plate_reader_file = 'Example_standards_raw.xlsx', standard_wells = c("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08"), dye_used = "BR", qubit_volume = 2, elution_volume = 100, plate_size = 96, plate_name = 'Example Plate', print_standard_curve = TRUE)
 
 
 ```
 
+The output of these functions looks like:
 
-Qubit merger
+```{r view_BR_concentration, echo=FALSE, message=FALSE, warning=FALSE}
+kable(sample_BR_dna) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
 
-Manual microbial density
+```
 
-automated microbial density
+If you are measuring the same sample with both the BR and HS dyes, you may want to combine the data from these two measurements. The `qubit_merger()` function handles this by selecting the DNA concentration according to the following rules:
+* If the HS DNA concentration is less than 75 ng/uL and the BR DNA concentration is less than 50 ng/uL, use the HS DNA concentration.
+* If the HS concentration is greater than 75 ng/uL and the BR DNA concentration is greater than 50 ng/uL, use the BR DNA concentration.
+* For all other cases, average the HS and BR DNA concentrations.
+
+By doing this, we try to keep the DNA concentration measurements in the more reliable ranges of the Qubit dyes.
+
+```{r qubit_merger, echo=TRUE, message=FALSE, warning=FALSE}
+sample_dna_combined <- qubit_merger(hs_data = sample_HS_dna, br_data = sample_BR_dna)
 
 
+```
 
-### Making use of the Beckmann robot
+This produces a data table that contains both of the individual measured concentrations and the "final" concentration:
+
+```{r view_merged_dna, echo=FALSE, message=FALSE, warning=FALSE}
+kable(sample_dna_combined) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+### Joining, filtering, and computing new columns
+To demonstrate a couple of examples of how to filter rows from your table, and how to add new columns to your data, I'll walk through a "manual" version of computing microbial density from samples. All of the pieces are in place if you follow the functions outlined above, we just need to do some division, and clean up our data.
+
+The DNA measurement functions will produce a table containing DNA concentrations based on all the samples in the plate that are not standards (so either 88 or 96 samples, for most uses). If there are wells that were empty, they will be carried over using these functions. To eliminate them, we can filter out individual wells using something like `filtered_table <- filter(unfiltered_table, !(Well %in% c("F11", "F12", "G04")))`. We can employ a variation of this to filter our samples based on some of the fields in our annotated sample information above. If you have used the Matrix plate scanner, you can simply filter out any samples that have a "No Tube" in the TubeBarcode field. Another filter that you can use commonly is to remove any samples whose mass is less than 10 mg. These are often empty tubes, or samples for which the fecal sample was too small, and so any errors in the DNA extraction are exacerbated when you calculate things like microbial density.
+
+```{r add_sample_information, echo=TRUE, message=FALSE, warning=FALSE}
+sample_dna_annotated <- left_join(annotated_data, sample_dna_combined) %>% 
+  filter(SampleMass > 10, TubeBarcode != "No Tube")
+
+```
+
+
+```{r view_final_table, echo=FALSE, message=FALSE, warning=FALSE}
+kable(sample_dna_annotated) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+
+To add a new column to our table, we can use the `mutate()` function from the dplyr package. It'll look something like:
+
+```{r compute_md, echo=TRUE, message=FALSE, warning=FALSE}
+microbial_density_data <- sample_dna_annotated %>% mutate(`Microbial Density (ug DNA per mg feces)` = (`Total DNA (ug)`/SampleMass)* 3.5)
+
+
+```
+
+If you notice, the microbial density measurement here is the total DNA from the sample divided by the sample mass, times 3.5 to account for the subsampling step during the DNA extraction. For samples extracted with phenol:chloroform there is no scaling necessary since you do not subsample.
 
 ### Plotting data
+I've also put together a few functions to help with plotting data. They consist of a couple of plot themes (`slides_theme()`, `slides_theme_tilted()`, `paper_theme()`, and `paper_theme_tilted()`), and one function to plot the mean $\pm$ standard error of the mean of grouped data (`geom_mean_sem()`). The plotting themes meant for slides simply make the font sizes and lines bigger by default. The plots made for papers makes the font sizes small, so that figures can be made to be approximately 2 inches by 2 inches and useable with minimal tweaking. I've also included here a color pallete that I find to be a bit easier to work with than the default colors from ggplot (`EJC_colors()`). The following plotting example shows a lot of these pieces in action.
+
+```{r plotting_intro, echo=TRUE, fig.height=4, fig.width=8, message=FALSE, warning=FALSE}
+
+plotting_data <- microbial_density_data %>% 
+  filter(Sample == "FP") %>% 
+  mutate(CageAnimal = stringr::str_sub(Animal, -1, -1), 
+         Cage = as.character(Cage),
+         Condition = level_reorder(Condition, c("Conventional", "AS4413", "NB71813", "GZ35-1", "1001095A+1001099B", "1001254A+1001262B", "1001262B+AVNC", "1001099B+AVNC", "1001262B_AVNC_Recovery", "1001099B_AVNC_Recovery")))
+
+sample_plot <- ggplot(data = plotting_data, aes(x = Condition, y = `Microbial Density (ug DNA per mg feces)`, shape = CageAnimal, color = Cage)) + geom_mean_sem(point.size = 2, line.size = 0.5) + faith_lab_theme_tilted() + scale_color_manual(values = EJC_colors)
+
+print(sample_plot)
+
+```
+
+There's a lot going on in that plot, but briefly, I first manipulated the data a little to make the data be a bit more plotting-friendly. I removed samples that were not fecal pellets, and then created a column for the individual animals in each of the cages (a, b, and c) so that I could plot those points as different shapes in the final plot. Lastly, I shuffled the order of the values of the "Condition" column using a helper function `level_reorder()`.
+
+The `geom_mean_sem()` function now can handle shapes and color groupings of variables, and you can change the size of the line and point sizes by assigning a new value to _point.size_ and _line.size_ within the `geom_mean_sem()`.
+
+### Making use of the Beckmann robot
 
 
 ## Examples of workflows
