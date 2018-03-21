@@ -9,6 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -23,15 +24,15 @@ options(knitr.table.format = "html")
 
 ```
 
-## Why use R?
+# Why use R?
 I've found that using a software like R has been immensely helpful in lab. The way I see it, it comes with two big advantages to doing things by hand. First, it _can_ drastically reduce the time to do things while simultaneously reducing the chances of making an error. There are inevitably going to be tasks that you find yourself doing over and over again (e.g. measuring DNA concentrations from samples with the plate reader). By investing some time up front to automate that process (and set it up well), you can then sit back and let the computer do the work and know that it won't make any mistakes. The one caveat here is that it might take a lot of time to get your function to work and work reliably, so there's a bit of a balance. Also, if you make a mistake in setting up your function, it will be carried through every time you use it later. The second big advantage is that since the files are all digital and most data analysis scripts are relatively small, you can essentially use your collection of scripts (that naturally come with timestamps) as a rough draft of a lab notebook. By making a new file for every new set of data you're crunching, you have a digital record of what you've done. 
 
 An additional perk of using R is that by now, there are a wealth of packages out there that can let you do pretty much anything you will want with your data (except, notoriously, an easy way to make 3D plots). With the functions contained in this package, I'm hoping to further bridge the gap between lab-specific uses of R and the rest universe of data handling packages.
 
-## Helpful tools to get started
-If you need to get started with R, there are a few helpful resources available on the web. In general, if you look up whatever you are having trouble with, plus "R stats" on Google, you should find a decent answer within the first few results. But for getting started from scratch, I'll simply link to a couple of [helpful](http://www.sr.bham.ac.uk/~ajrs/R/why_R.html) [resources](http://swirlstats.com/students.html) I've come across. By no means are they the only ones available, and you might very well find another that is more helpful to you. One last very helpful resource is the ["tidyverse"](http://r4ds.had.co.nz). It is a set of R packages that are meant to work with each other to simplify most of the steps along the data analysis pipeline from reading data in, manipulating the data, and plotting it. It was developed and maintianed by Hadley Wickham, the chief scientist of [RStudio](https://www.rstudio.com), which is another tool that you'll want to get your hands on. 
+# Helpful tools to get started
+If you need to get started with R, there are a few helpful resources available on the web. In general, if you look up whatever you are having trouble with, plus "R stats" on Google, you should find a decent answer within the first few results. But for getting started from scratch, I'll simply link to a couple of [helpful](http://www.sr.bham.ac.uk/~ajrs/R/why_R.html) [resources](http://swirlstats.com/students.html) I've come across. By no means are they the only ones available, and you might very well find another that is more helpful to you. One last very helpful resource is the ["tidyverse"](http://r4ds.had.co.nz). It is a set of R packages that are meant to work with each other to simplify most of the steps along the data analysis pipeline from reading data in, manipulating the data, and plotting it. It was developed and maintianed by Hadley Wickham, the chief scientist of [RStudio](https://www.rstudio.com), which is another tool that you'll want to get your hands on. From here on out, I'll assume you have RStudio installed with the latest version of R (at least 3.4.4). With that in hand, we can go on and explore what this package has to offer.
 
-## Lab-specific functions within this package
+# Walkthrough of package functions
 The purpose of this package is to put together a collection of (hopefully) broadly-applicable functions that can be used by some/most people in the lab. So what follows is a small description of each of the individual functions I've put into this package, and then some examples of workflows that utilize some or most of these functions.
 
 To use this package, install it from bitbucket. You will first have to install the devtools package:
@@ -69,7 +70,7 @@ sessionInfo()
 ```
 
 
-### Generating example files to work with
+## Generating example files to work with
 If you don't have any files to work with, or if you can't figure out why something isn't working, I've included a good number of files in this package that should be helpful. To generate these files in your computer, use the `make_example_files()` function. If you do not provide a directory, it will create the files in your current directory:
 
 ```{r make_example_files, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
@@ -85,7 +86,7 @@ make_example_files()
 I will refer to these files moving forward, so if you want to be able to replicate any of the steps, you can use these files as a guide.
 
 
-### Sample weighing using barcoded tubes
+## Sample weighing using barcoded tubes
 A key aspect of measuring microbiota density in fecal samples is to accurately mass each sample. To do this, we've developed a barcoding system to label and keep track of tubes as they are weighed using the digital scale. A key part of this is the [LabelMaker Spreadsheet](https://docs.google.com/spreadsheets/d/1ngMyWLLtBerwBpAPl713UGix9b-jHmzALFPLHiP7UY0/edit?usp=sharing) which makes barcodes for each sample. With these labels on the tubes, we can weigh each tube quickly and keep track of which tube is which. By weighing each tube before and after collecting a sample, we can calculate the mass of each sample. Since tubes can easily get shuffled around, the point of the `mass_and_order()` function is to use the barcodes to keep track of each sample, and to pair each full weight with the correct empty weight. We can use it to read in two sample mass files and get a sample mass output:
 
 ```{r sample_mass - basic, echo=TRUE, message=FALSE, warning=FALSE}
@@ -119,7 +120,7 @@ kable(sample_weights_and_location) %>%
 
 If you do not provide a plate name, it will return the plate name given from the plate scanner.
 
-### Reading in files with sample information
+## Reading in files with sample information
 If you have a file that contains more sample information that what is contained in the barcode, you can also read it in and join it with any other data. To do so, you can use the `read_sample_info()` function, which was written to be able to take in any type of tabular data (.csv OR excel), and load it into R. You can then join the data using the [dplyr package join functions](http://dplyr.tidyverse.org/reference/join.html) which should be loaded with the FaithLabTools package. It is important to note that at least one column must be shared between your sample information and the data you want to join it to - otherwise it will be impossible to combine the right information and sample.
 
 ```{r add_sample_info, echo=TRUE, message=FALSE, warning=FALSE}
@@ -138,7 +139,7 @@ kable(annotated_data) %>%
 
 This data can now be used to join with other data sources and to plot data according to any number of variables included in the sample information.
 
-### Reading plate reader files
+## Reading plate reader files
 Whether you are using the plate reader to read an ELISA or DNA concentrations, you can use the general `read_plate()` function. The function is intended to read files from the plate reader directly (the raw excel file that it produces), and expects that the plate reader only makes one measurement per well:
 
 ```{r read_plate}
@@ -155,7 +156,7 @@ kable(plate_reader_data) %>%
 
 The function also allows you to specify if you are using a 384-well plate by changing the `size` parameter, but I haven't worked much with 384-well plates and the plate reader so it isn't as well tested as using a 96-well plate.
 
-### Measuring DNA concentrations
+## Measuring DNA concentrations
 For the specific case of measuring DNA concentrations using the qubit dyes (HS or BR), I've put together a function that will read in the plate reader file, compute a standard curve, and generate DNA concentrations for each sample. The `measure_dna_concentration()` function requires a lot more inputs than the previous ones, so I will describe them more in full:
 
 * `plate_reader_file` - path to the raw file from the plate reader
@@ -212,7 +213,7 @@ kable(sample_dna_combined) %>%
 
 ```
 
-### Joining, filtering, and computing new columns
+## Joining, filtering, and computing new columns
 To demonstrate a couple of examples of how to filter rows from your table, and how to add new columns to your data, I'll walk through a "manual" version of computing microbiota density from samples. All of the pieces are in place if you follow the functions outlined above, we just need to do some division, and clean up our data.
 
 The DNA measurement functions will produce a table containing DNA concentrations based on all the samples in the plate that are not standards (so either 88 or 96 samples, for most uses). If there are wells that were empty, they will be carried over using these functions. To eliminate them, we can filter out individual wells using something like `filtered_table <- filter(unfiltered_table, !(Well %in% c("F11", "F12", "G04")))`. We can employ a variation of this to filter our samples based on some of the fields in our annotated sample information above. If you have used the Matrix plate scanner, you can simply filter out any samples that have a "No Tube" in the TubeBarcode field. Another filter that you can use commonly is to remove any samples whose mass is less than 10 mg. These are often empty tubes, or samples for which the fecal sample was too small, and so any errors in the DNA extraction are exacerbated when you calculate things like microbiota density.
@@ -247,7 +248,7 @@ If you notice, the microbiota density measurement here is the total DNA from the
 
 As a general note, if you want to create or access columns with "nice" names (e.g. with spaces, descriptions, etc), you can use the \` character to denote the column name. This is used above to create the "Microbiota Density (ug DNA per mg feces)" column. If you want to create simple column names that do not include spaces or special characters, you do not need to wrap your column name in the \` character. It is often much easier to use and access simpler column names, but for clarity and ease of use outside of R, it may make sense in to use complicated column names.
 
-### Plotting data
+## Plotting data
 I've also put together a couple of functions to help with plotting data. They consist of a couple of plot themes (`faith_lab_theme()` and `faith_lab_theme_tilted()`), and one function to plot the mean $\pm$ standard error of the mean of grouped data (`geom_mean_sem()`). The plotting themes meant for slides simply make the font sizes and lines bigger by default. The plots made for papers makes the font sizes small, so that figures can be made to be approximately 2 inches by 2 inches and useable with minimal tweaking. I've also included here a color pallete that I find to be a bit easier to work with than the default colors from ggplot (`EJC_colors()`). The following plotting example shows a lot of these pieces in action.
 
 ```{r plotting_intro, echo=TRUE, fig.height=4, fig.width=8, message=FALSE, warning=FALSE}
@@ -270,7 +271,7 @@ The `geom_mean_sem()` function now can handle shapes and color groupings of vari
 
 By default, the plotting themes `faith_lab_theme()` and `faith_lab_theme_tilted()` produce plots that are meant to be relatively small (for printing, papers, etc.). If you would like to make plots that are more readily adapted to larger formats such as powerpoint slides or posters, you can pass an argument to the function: `faith_lab_theme(plot_size = 'big')`. 
 
-### Calculating dilutions for samples
+## Calculating dilutions for samples
 An important step for library preps is to dilute samples to the appropriate concentration for PCR (in the case of 16S) or sonication and end repair (for metagenomics). The `dilution_calculation()` function is aimed at making this simpler, and was made to be used as generally as possible. The function takes in any data table (does not need to be generated using the other functions in this package), that contains one column of DNA concentrations. The function will then attempt to dilute samples to a target concentration with a few limitations. There is a limit of the amount of source material that can be used (default = 40 uL, but can be changed), as well as an upper limit on the total volume to be diluted into (default = 200 uL, since that is the standard maximum volume of 96-well plates). To see this in action, we can use our sample data from above:
 
 ```{r dilution_example, echo=TRUE, message=FALSE, warning=FALSE}
@@ -288,7 +289,7 @@ kable(samples_dilution) %>%
 
 As you can see, the dilutions are not performed equally. The "Note" column added to the data frame will indicate what steps were involved in performing the dilution. By design, this algorithm is intended to minimize the use of source sample, while maintaining pipetting volumes greater than 1 uL for increased accuracy. If samples are too dilute or too concentrated to reach the target concentration, a warning will appear in the "Note" column. Playing with the maximum sample volume and maximum volume parameters may help, but there may also be some samples that need to be considered individually.
 
-### Using Beckmann liquid-handling robot for dilutions
+## Using Beckmann liquid-handling robot for dilutions
 To use the Beckmann liquid-hanlding robot to perform your dilutions, you need to give the robot's software a .csv file that contains information about how to dilute your samples. To generate such a file, you can pass a few more arguments to the same `dilution_calculation()` function above. The additional pieces that you need to include are `print_for_robot`, which you need to set to `TRUE`, `output_directory` which defaults to your working directory, but you can pass along a string to indicate where to place the output file, and `output_filename`, which you can use to name your output file, (default is "robot_dilution_file _YYYY_MM_DD.csv" -- NOTE: you do not need to include the ".csv" file extension in the name you provide). 
 
 ```{r robot_dilution_example, echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
@@ -300,7 +301,7 @@ If you look, you will notice that the format of the output file is not the same 
 
 As a side note, it is important that your input data table have two columns to indicate where samples are coming from. One is "PlateID" which gives each individual source plate a unique name, and the other is "SampleWell", which gives each sample a location within each source plate. You will get an error if your input data table does not include this information. This is important because you can use this function to help dilute many samples at a time, across several sample plates. In fact, the order in which the data table is inputted will be the order in which samples are (re-)arrayed into plates that have your desired concentraiton. So if you want to combine 192 samples from four different plates into two new plates, you can do so at the same time as you dilute your samples.
 
-### Using Beckmann liquid-handling robot to evenly pool samples
+## Using Beckmann liquid-handling robot to evenly pool samples
 Another helpful way to use the Beckmann robot is to perform even pooling of samples (e.g. library prep PCR products). To do this, you can use the `robot_equal_combine()` function, which is very similar to the `dilution_calculation()` function in reverse. This function was primarily designed to pool a 384-well plate into as few wells as possible in a deep-well 96 well plate. If you are using a different set up, you will need to change some of the default behaviors so that you do not pipet volumes that are too large or pipet from a 384 well format when you have our DNA in a 96 well plate. 
 
 We'll get to how to use the function in a little bit, but first it is worth walking through generating the right data to input into the function, since it can get complicated to work with 384 well plates when we use a 96-well plate to quantify DNA.
@@ -404,9 +405,9 @@ pooling_table <- robot_equal_combine(dataset = combined_pcr_samples_384, min_vol
 
 ```
 
-### Other helpful functions for manipulating data
+## Other helpful package components
 
-#### Sequencing Indexes
+### Sequencing Indexes
 There are a couple of other helpful components of this package that can be useful. For one, I have included a couple of data tables to help keep track of samples for sequecning. For one, the data tables `index_mapping_16S` and `index_mapping_metagenomics` provide the sequencing indexes for the 16S and metagenomics library preps, and where they are located (Plate and Well). 
 
 ```{r call_View_16S_index,  echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
@@ -441,7 +442,7 @@ These are very helpful in building a sequencing mapping file for further analysi
 
 There are also a couple of functions that are used within the functions described above that can be useful on their own if you need them.
 
-#### Converting between well names and numbers
+### Converting between well names and numbers
 
 `well_parser()` helps go from a well location (e.g. "B07") to a well number. This is helpful since the Beckman robot only accepts well numbers and not locations. It is designed to handle well locations in 96 and 384 well formats:
 
@@ -461,11 +462,11 @@ well_number_to_location(well_number = 84, size = 384)
 
 ```
 
-#### Using the matrix rack 96-barcode scanner
+### Using the matrix rack 96-barcode scanner
 
 `matrix_plate_parser()` helps take the output from the Cho Lab matrix rack barcode scanner and build a data frame in R. The input can either be the .csv output from the plate scanner software or the .xls output. This function can handle either format.
 
-```{r matrix_plate_parser_demo, echo=FALSE, message=TRUE, warning=FALSE}
+```{r matrix_plate_parser_demo, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 sample_plate_scan <- matrix_plate_parser(matrix_barcode_plate_scan = 'Example_matrix_plate_scan.csv', plate_name = 'Test_Plate')
 
 ```
