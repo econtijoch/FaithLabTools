@@ -42,7 +42,7 @@ install.packages('devtools')
 
 ```
 
-Then, you can use the devtools package to install the FaithLabTools package. We pass along the *build_vignettes* flag in order to ensure that this helpful guide is included in the package installation:
+Then, you can use the devtools package to install the [FaithLabTools package from bitbucket](https://bitbucket.org/econtijoch/faithlabtools). We pass along the *build_vignettes* flag in order to ensure that this helpful guide is included in the package installation:
 
 ```{r install_FaithLabTools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 devtools::install_bitbucket('econtijoch/faithlabtools', build_vignettes = TRUE)
