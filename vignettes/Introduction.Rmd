@@ -61,6 +61,13 @@ library(FaithLabTools)
 
 Using either `require()` or `library()` works. To access this vignette within R, you can execute the following command: `vignette("Introduction", package = "FaithLabTools")`.
 
+If you have any issues getting the package to work, try installing the package with `build_vignettes = FALSE`. You can also compare your system setup by using `sessionInfo()`.
+
+```{r system_info, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+sessionInfo()
+
+```
+
 
 ### Generating example files to work with
 If you don't have any files to work with, or if you can't figure out why something isn't working, I've included a good number of files in this package that should be helpful. To generate these files in your computer, use the `make_example_files()` function. If you do not provide a directory, it will create the files in your current directory:
@@ -146,20 +153,20 @@ kable(plate_reader_data) %>%
 
 ```
 
-The function also allows you to specify if you are using a 384-well plate by changing the _size_ parameter, but I haven't worked much with 384-well plates and the plate reader so it isn't as well tested as using a 96-well plate.
+The function also allows you to specify if you are using a 384-well plate by changing the `size` parameter, but I haven't worked much with 384-well plates and the plate reader so it isn't as well tested as using a 96-well plate.
 
 ### Measuring DNA concentrations
 For the specific case of measuring DNA concentrations using the qubit dyes (HS or BR), I've put together a function that will read in the plate reader file, compute a standard curve, and generate DNA concentrations for each sample. The `measure_dna_concentration()` function requires a lot more inputs than the previous ones, so I will describe them more in full:
 
-* *plate_reader_file* - path to the raw file from the plate reader
-* *standards_plate_reader_file* - path to the raw file from the plate reader that contains the standards information. If the standards are on the same plate that you want to measure, you can leave this out, since it defaults to the *plate_reader_file*
-* *standard_wells* - a vector of the wells that contain the standards, in increasing concentration order. These need to be in the 2-digit format (e.g. "A01", "B07", and NOT "A1", "B7"). 
-* *dye_used* - specify whether you measured DNA with the HS or BR dye. Must be wrapped in quotes.
-* *qubit_volume* - indicate how much DNA was used to measure the DNA (default = 2 uL)
-* *elution_volume* - indicate how much EB was used to elute the DNA (default = 100 uL)
-* *plate_size* - indicate plate size (default = 96, and honestly I haven't tried 384)
-* *plate_name* - a name for the plate, similar to examples above
-* *print_standard_curve* - TRUE or FALSE to indicate whether or not to print a plot of the standard curve
+* `plate_reader_file` - path to the raw file from the plate reader
+* `standards_plate_reader_file` - path to the raw file from the plate reader that contains the standards information. If the standards are on the same plate that you want to measure, you can leave this out, since it defaults to the `plate_reader_file`.
+* `standard_wells` - a vector of the wells that contain the standards, in increasing concentration order. These need to be in the 2-digit format (e.g. "A01", "B07", and NOT "A1", "B7"). 
+* `dye_used` - specify whether you measured DNA with the HS or BR dye. Must be wrapped in quotes.
+* `qubit_volume` - indicate how much DNA was used to measure the DNA (default = 2 uL)
+* `elution_volume` - indicate how much EB was used to elute the DNA (default = 100 uL)
+* `plate_size` - indicate plate size (default = 96, and honestly I haven't tried 384)
+* `plate_name` - a name for the plate, similar to examples above
+* `print_standard_curve` - TRUE or FALSE to indicate whether or not to print a plot of the standard curve
 
 ```{r HS_concentration, echo=TRUE, message=FALSE, warning=FALSE}
 sample_HS_dna <- measure_dna_concentration(plate_reader_file = 'Example_HS_raw.xlsx', standards_plate_reader_file = 'Example_standards_raw.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 100, plate_size = 96, plate_name = 'Example Plate', print_standard_curve = TRUE)
@@ -259,7 +266,7 @@ print(sample_plot)
 
 There's a lot going on in that plot, but briefly, I first manipulated the data a little to make the data be a bit more plotting-friendly. I removed samples that were not fecal pellets, and then created a column for the individual animals in each of the cages (a, b, and c) so that I could plot those points as different shapes in the final plot. Lastly, I shuffled the order of the values of the "Condition" column using a helper function `level_reorder()`. This function takes a vector of factors and re-orders the levels of the factor. It is important that the names of the levels match the existing levels exactly.
 
-The `geom_mean_sem()` function now can handle shapes and color groupings of variables, and you can change the size of the line and point sizes by assigning a new value to _point.size_ and _line.size_ within the `geom_mean_sem()`.
+The `geom_mean_sem()` function now can handle shapes and color groupings of variables, and you can change the size of the line and point sizes by assigning a new value to `point.size` and `line.size` within the `geom_mean_sem()`.
 
 By default, the plotting themes `faith_lab_theme()` and `faith_lab_theme_tilted()` produce plots that are meant to be relatively small (for printing, papers, etc.). If you would like to make plots that are more readily adapted to larger formats such as powerpoint slides or posters, you can pass an argument to the function: `faith_lab_theme(plot_size = 'big')`. 
 
@@ -371,12 +378,12 @@ You can also see thath I've taken the opportunity here to go ahead and written o
 
 Now, we can finally use the `robot_equal_combine()` function. There are a couple of nice features to this function that helps perform the pooling step efficiently, that are reflected in the arguments passed to the function:
 
-* *dataset* input data table (e.g. DNA quantification of PCR products) - must contain a couple of columns (BarcodeID, PlateID, SampleWell, and DNA_Concentration)
-* *min_volume* minimum volume of sample to combine (default = 1.5) - this is helpful if you want to change the smallest volume to be pipetted by the robot - typically 1 uL is good to be robust to errors.
-* *max_volume* maximum volume of sample to combine (default = 6) - this is helpful so that you do not take all of your sample, or so that you do not try to pool more than the amount of sample you actually have remaining.
-* *number_of_pools* number of different pools to create (default = "Auto" which creates as few as possible while maintaining each pool under the maximum pool size)
-* *maximum_pool_size* maximum volume of any one pool
-* *starting_plate_size* size of plate to pool from (384 or 96); NOTE: default is 384.
+* `dataset` input data table (e.g. DNA quantification of PCR products) - must contain a couple of columns (BarcodeID, PlateID, SampleWell, and DNA_Concentration)
+* `min_volume` minimum volume of sample to combine (default = 1.5) - this is helpful if you want to change the smallest volume to be pipetted by the robot - typically 1 uL is good to be robust to errors.
+* `max_volume` maximum volume of sample to combine (default = 6) - this is helpful so that you do not take all of your sample, or so that you do not try to pool more than the amount of sample you actually have remaining.
+* `number_of_pools` number of different pools to create (default = "Auto" which creates as few as possible while maintaining each pool under the maximum pool size)
+* `maximum_pool_size` maximum volume of any one pool
+* `starting_plate_size` size of plate to pool from (384 or 96); NOTE: default is 384.
 
 
 ```{r pool_pcr_quantification, echo=TRUE, message=TRUE, warning=FALSE}
@@ -388,9 +395,9 @@ The function will give you a message in the command line that indicates how the 
 
 And just like the `dilution_calculation()` function, we can optionally decide to print this table to be used directly with the robot. To do so, we need to provide the same additional arguments as for the dilution function:
 
-* *print_for_robot* TRUE/FALSE to indicate whether or not a file should be made to be used with the robot (default = FALSE)
-* *output_directory* directory to save file for use with the robot print_for_robot must be TRUE (default = working directory)
-* *output_filename* filename for output file. If none is given, default will be "robot_pooling_file_YYYY_MM_DD.csv". It is not necessary to provide the '.csv' extension.
+* `print_for_robot` TRUE/FALSE to indicate whether or not a file should be made to be used with the robot (default = FALSE)
+* `output_directory` directory to save file for use with the robot print_for_robot must be TRUE (default = working directory)
+* `output_filename` filename for output file. If none is given, default will be "robot_pooling_file_YYYY_MM_DD.csv". It is not necessary to provide the '.csv' extension.
 
 ```{r pool_pcr_quantification_printed, echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 pooling_table <- robot_equal_combine(dataset = combined_pcr_samples_384, min_volume = 1, max_volume = 12, number_of_pools = "Auto", maximum_pool_size = 500, starting_plate_size = 384, print_for_robot = TRUE, output_directory = "/path/to/some/directory", output_filename = 'my_pooling_for_robot')')
