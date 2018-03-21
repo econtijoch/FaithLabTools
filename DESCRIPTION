@@ -3,7 +3,7 @@ Type: Package
 Title: R Scripts for Faith Lab @ MSSM
 Version: 0.1.0
 Authors@R: person("Eduardo", "Contijoch", email = "eduardo.contijoch@gmail.com", role = c("aut", "cre"))
-Description: Package that consolidate all of my scripts for doing things aroudn the lab (mostly around plate reader and robot).
+Description: Package that consolidate all of my scripts for doing things around the lab (mostly around plate reader and robot).
 License: GPL (>= 2)
 LazyData: TRUE
 Depends:
