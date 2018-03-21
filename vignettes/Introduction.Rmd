@@ -41,10 +41,10 @@ install.packages('devtools')
 
 ```
 
-Then, you can use the devtools package to install the FaithLabTools package:
+Then, you can use the devtools package to install the FaithLabTools package. We pass along the *build_vignettes* flag in order to ensure that this helpful guide is included in the package installation:
 
 ```{r install_FaithLabTools, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
-devtools::install_bitbucket('econtijoch/FaithLab)
+devtools::install_bitbucket('econtijoch/faithlabtools', build_vignettes = TRUE)
 
 ```
 
@@ -59,7 +59,7 @@ library(FaithLabTools)
 
 ```
 
-Using either `require()` or `library()` works.
+Using either `require()` or `library()` works. To access this vignette within R, you can execute the following command: `vignette("Introduction", package = "FaithLabTools")`.
 
 
 ### Generating example files to work with
@@ -79,7 +79,7 @@ I will refer to these files moving forward, so if you want to be able to replica
 
 
 ### Sample weighing using barcoded tubes
-A key aspect of measuring microbial density in fecal samples is to accurately mass each sample. To do this, we've developed a barcoding system to label and keep track of tubes as they are weighed using the digital scale. A key part of this is the [LabelMaker Spreadsheet](https://docs.google.com/spreadsheets/d/1ngMyWLLtBerwBpAPl713UGix9b-jHmzALFPLHiP7UY0/edit?usp=sharing) which makes barcodes for each sample. With these labels on the tubes, we can weigh each tube quickly and keep track of which tube is which. By weighing each tube before and after collecting a sample, we can calculate the mass of each sample. Since tubes can easily get shuffled around, the point of the `mass_and_order()` function is to use the barcodes to keep track of each sample, and to pair each full weight with the correct empty weight. We can use it to read in two sample mass files and get a sample mass output:
+A key aspect of measuring microbiota density in fecal samples is to accurately mass each sample. To do this, we've developed a barcoding system to label and keep track of tubes as they are weighed using the digital scale. A key part of this is the [LabelMaker Spreadsheet](https://docs.google.com/spreadsheets/d/1ngMyWLLtBerwBpAPl713UGix9b-jHmzALFPLHiP7UY0/edit?usp=sharing) which makes barcodes for each sample. With these labels on the tubes, we can weigh each tube quickly and keep track of which tube is which. By weighing each tube before and after collecting a sample, we can calculate the mass of each sample. Since tubes can easily get shuffled around, the point of the `mass_and_order()` function is to use the barcodes to keep track of each sample, and to pair each full weight with the correct empty weight. We can use it to read in two sample mass files and get a sample mass output:
 
 ```{r sample_mass - basic, echo=TRUE, message=FALSE, warning=FALSE}
 sample_weights <- mass_and_order(empty_weights = 'Example_empty_weights.txt', full_weights = 'Example_full_weights.txt')
@@ -113,7 +113,7 @@ kable(sample_weights_and_location) %>%
 If you do not provide a plate name, it will return the plate name given from the plate scanner.
 
 ### Reading in files with sample information
-If you have a file that contains more sample information that what is contained in the barcode, you can also read it in and join it with any other data. To do so, you can use the `read_sample_info()` function, which was written to be able to take in any type of tabular data (.csv OR excel), and load it into R. You can then join the data using the [dplyr package join functions](http://dplyr.tidyverse.org/reference/join.html) which should be loaded with the FaithLabTools package.
+If you have a file that contains more sample information that what is contained in the barcode, you can also read it in and join it with any other data. To do so, you can use the `read_sample_info()` function, which was written to be able to take in any type of tabular data (.csv OR excel), and load it into R. You can then join the data using the [dplyr package join functions](http://dplyr.tidyverse.org/reference/join.html) which should be loaded with the FaithLabTools package. It is important to note that at least one column must be shared between your sample information and the data you want to join it to - otherwise it will be impossible to combine the right information and sample.
 
 ```{r add_sample_info, echo=TRUE, message=FALSE, warning=FALSE}
 sample_information <- read_sample_info('Example_sampleInfo.csv')
@@ -182,7 +182,8 @@ kable(sample_BR_dna) %>%
 
 ```
 
-If you are measuring the same sample with both the BR and HS dyes, you may want to combine the data from these two measurements. The `qubit_merger()` function handles this by selecting the DNA concentration according to the following rules:
+If you are measuring the same sample with both the BR and HS dyes, you may want to combine the data from these two measurements. As in the example above, it is not uncommon for samples with low concentration of DNA to produce negative values if you measure only with the BR dye (e.g. sample in well A01 above). The `qubit_merger()` function helps stitch together measurements of samples with both dyes by selecting the DNA concentration according to the following rules:
+
 * If the HS DNA concentration is less than 75 ng/uL and the BR DNA concentration is less than 50 ng/uL, use the HS DNA concentration.
 * If the HS concentration is greater than 75 ng/uL and the BR DNA concentration is greater than 50 ng/uL, use the BR DNA concentration.
 * For all other cases, average the HS and BR DNA concentrations.
@@ -205,9 +206,12 @@ kable(sample_dna_combined) %>%
 ```
 
 ### Joining, filtering, and computing new columns
-To demonstrate a couple of examples of how to filter rows from your table, and how to add new columns to your data, I'll walk through a "manual" version of computing microbial density from samples. All of the pieces are in place if you follow the functions outlined above, we just need to do some division, and clean up our data.
+To demonstrate a couple of examples of how to filter rows from your table, and how to add new columns to your data, I'll walk through a "manual" version of computing microbiota density from samples. All of the pieces are in place if you follow the functions outlined above, we just need to do some division, and clean up our data.
 
-The DNA measurement functions will produce a table containing DNA concentrations based on all the samples in the plate that are not standards (so either 88 or 96 samples, for most uses). If there are wells that were empty, they will be carried over using these functions. To eliminate them, we can filter out individual wells using something like `filtered_table <- filter(unfiltered_table, !(Well %in% c("F11", "F12", "G04")))`. We can employ a variation of this to filter our samples based on some of the fields in our annotated sample information above. If you have used the Matrix plate scanner, you can simply filter out any samples that have a "No Tube" in the TubeBarcode field. Another filter that you can use commonly is to remove any samples whose mass is less than 10 mg. These are often empty tubes, or samples for which the fecal sample was too small, and so any errors in the DNA extraction are exacerbated when you calculate things like microbial density.
+The DNA measurement functions will produce a table containing DNA concentrations based on all the samples in the plate that are not standards (so either 88 or 96 samples, for most uses). If there are wells that were empty, they will be carried over using these functions. To eliminate them, we can filter out individual wells using something like `filtered_table <- filter(unfiltered_table, !(Well %in% c("F11", "F12", "G04")))`. We can employ a variation of this to filter our samples based on some of the fields in our annotated sample information above. If you have used the Matrix plate scanner, you can simply filter out any samples that have a "No Tube" in the TubeBarcode field. Another filter that you can use commonly is to remove any samples whose mass is less than 10 mg. These are often empty tubes, or samples for which the fecal sample was too small, and so any errors in the DNA extraction are exacerbated when you calculate things like microbiota density.
+
+As a side note, I use the pipe function (\%>\%) from the [magrittr](http://r4ds.had.co.nz/pipes.html) package that really helps make the code much more readable by passing along the results of any computations/data performed on the left of the pipe to the functions to the right of the pipe.
+
 
 ```{r add_sample_information, echo=TRUE, message=FALSE, warning=FALSE}
 sample_dna_annotated <- left_join(annotated_data, sample_dna_combined) %>% 
@@ -220,61 +224,250 @@ sample_dna_annotated <- left_join(annotated_data, sample_dna_combined) %>%
 kable(sample_dna_annotated) %>% 
   kable_styling() %>%
   scroll_box(height = '300px')
-
+  
 ```
-
 
 To add a new column to our table, we can use the `mutate()` function from the dplyr package. It'll look something like:
 
 ```{r compute_md, echo=TRUE, message=FALSE, warning=FALSE}
-microbial_density_data <- sample_dna_annotated %>% mutate(`Microbial Density (ug DNA per mg feces)` = (`Total DNA (ug)`/SampleMass)* 3.5)
+microbiota_density_data <- sample_dna_annotated %>% 
+  mutate(`Microbiota Density (ug DNA per mg feces)` = (Total_DNA/SampleMass)* 3.5)
 
 
 ```
 
-If you notice, the microbial density measurement here is the total DNA from the sample divided by the sample mass, times 3.5 to account for the subsampling step during the DNA extraction. For samples extracted with phenol:chloroform there is no scaling necessary since you do not subsample.
+If you notice, the microbiota density measurement here is the total DNA from the sample divided by the sample mass, times 3.5 to account for the subsampling step during the DNA extraction (200 uL taken from 700 uL of the lysate). For samples extracted with phenol:chloroform there is no scaling necessary since you do not subsample.
+
+As a general note, if you want to create or access columns with "nice" names (e.g. with spaces, descriptions, etc), you can use the \` character to denote the column name. This is used above to create the "Microbiota Density (ug DNA per mg feces)" column. If you want to create simple column names that do not include spaces or special characters, you do not need to wrap your column name in the \` character. It is often much easier to use and access simpler column names, but for clarity and ease of use outside of R, it may make sense in to use complicated column names.
 
 ### Plotting data
-I've also put together a few functions to help with plotting data. They consist of a couple of plot themes (`slides_theme()`, `slides_theme_tilted()`, `paper_theme()`, and `paper_theme_tilted()`), and one function to plot the mean $\pm$ standard error of the mean of grouped data (`geom_mean_sem()`). The plotting themes meant for slides simply make the font sizes and lines bigger by default. The plots made for papers makes the font sizes small, so that figures can be made to be approximately 2 inches by 2 inches and useable with minimal tweaking. I've also included here a color pallete that I find to be a bit easier to work with than the default colors from ggplot (`EJC_colors()`). The following plotting example shows a lot of these pieces in action.
+I've also put together a couple of functions to help with plotting data. They consist of a couple of plot themes (`faith_lab_theme()` and `faith_lab_theme_tilted()`), and one function to plot the mean $\pm$ standard error of the mean of grouped data (`geom_mean_sem()`). The plotting themes meant for slides simply make the font sizes and lines bigger by default. The plots made for papers makes the font sizes small, so that figures can be made to be approximately 2 inches by 2 inches and useable with minimal tweaking. I've also included here a color pallete that I find to be a bit easier to work with than the default colors from ggplot (`EJC_colors()`). The following plotting example shows a lot of these pieces in action.
 
 ```{r plotting_intro, echo=TRUE, fig.height=4, fig.width=8, message=FALSE, warning=FALSE}
 
-plotting_data <- microbial_density_data %>% 
+plotting_data <- microbiota_density_data %>% 
   filter(Sample == "FP") %>% 
   mutate(CageAnimal = stringr::str_sub(Animal, -1, -1), 
          Cage = as.character(Cage),
          Condition = level_reorder(Condition, c("Conventional", "AS4413", "NB71813", "GZ35-1", "1001095A+1001099B", "1001254A+1001262B", "1001262B+AVNC", "1001099B+AVNC", "1001262B_AVNC_Recovery", "1001099B_AVNC_Recovery")))
 
-sample_plot <- ggplot(data = plotting_data, aes(x = Condition, y = `Microbial Density (ug DNA per mg feces)`, shape = CageAnimal, color = Cage)) + geom_mean_sem(point.size = 2, line.size = 0.5) + faith_lab_theme_tilted() + scale_color_manual(values = EJC_colors)
+sample_plot <- ggplot(data = plotting_data, aes(x = Condition, y = `Microbiota Density (ug DNA per mg feces)`, shape = CageAnimal, color = Cage)) + geom_mean_sem(point.size = 2, line.size = 0.5) + faith_lab_theme_tilted() + scale_color_manual(values = EJC_colors)
 
 print(sample_plot)
 
 ```
 
-There's a lot going on in that plot, but briefly, I first manipulated the data a little to make the data be a bit more plotting-friendly. I removed samples that were not fecal pellets, and then created a column for the individual animals in each of the cages (a, b, and c) so that I could plot those points as different shapes in the final plot. Lastly, I shuffled the order of the values of the "Condition" column using a helper function `level_reorder()`.
+There's a lot going on in that plot, but briefly, I first manipulated the data a little to make the data be a bit more plotting-friendly. I removed samples that were not fecal pellets, and then created a column for the individual animals in each of the cages (a, b, and c) so that I could plot those points as different shapes in the final plot. Lastly, I shuffled the order of the values of the "Condition" column using a helper function `level_reorder()`. This function takes a vector of factors and re-orders the levels of the factor. It is important that the names of the levels match the existing levels exactly.
 
 The `geom_mean_sem()` function now can handle shapes and color groupings of variables, and you can change the size of the line and point sizes by assigning a new value to _point.size_ and _line.size_ within the `geom_mean_sem()`.
 
-### Making use of the Beckmann robot
+By default, the plotting themes `faith_lab_theme()` and `faith_lab_theme_tilted()` produce plots that are meant to be relatively small (for printing, papers, etc.). If you would like to make plots that are more readily adapted to larger formats such as powerpoint slides or posters, you can pass an argument to the function: `faith_lab_theme(plot_size = 'big')`. 
+
+### Calculating dilutions for samples
+An important step for library preps is to dilute samples to the appropriate concentration for PCR (in the case of 16S) or sonication and end repair (for metagenomics). The `dilution_calculation()` function is aimed at making this simpler, and was made to be used as generally as possible. The function takes in any data table (does not need to be generated using the other functions in this package), that contains one column of DNA concentrations. The function will then attempt to dilute samples to a target concentration with a few limitations. There is a limit of the amount of source material that can be used (default = 40 uL, but can be changed), as well as an upper limit on the total volume to be diluted into (default = 200 uL, since that is the standard maximum volume of 96-well plates). To see this in action, we can use our sample data from above:
+
+```{r dilution_example, echo=TRUE, message=FALSE, warning=FALSE}
+samples_dilution <- dilution_calculation(data_table = sample_dna_combined, concentration_column = "DNA_Concentration", target_concentration = 2, maximum_sample_volume = 30, maximum_volume = 200)
+
+```
 
 
-## Examples of workflows
+```{r view_dilution_table, echo=FALSE, message=FALSE, warning=FALSE}
+kable(samples_dilution) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
 
-### High-throughput microbial density measurements
-Mass samples
-Read order from Cho lab
-DNA concentration
-Microbial density
-Plot
+```
 
-### 16S sequencing prep
-DNA concentration
-Normalize
-Pool
+As you can see, the dilutions are not performed equally. The "Note" column added to the data frame will indicate what steps were involved in performing the dilution. By design, this algorithm is intended to minimize the use of source sample, while maintaining pipetting volumes greater than 1 uL for increased accuracy. If samples are too dilute or too concentrated to reach the target concentration, a warning will appear in the "Note" column. Playing with the maximum sample volume and maximum volume parameters may help, but there may also be some samples that need to be considered individually.
+
+### Using Beckmann liquid-handling robot for dilutions
+To use the Beckmann liquid-hanlding robot to perform your dilutions, you need to give the robot's software a .csv file that contains information about how to dilute your samples. To generate such a file, you can pass a few more arguments to the same `dilution_calculation()` function above. The additional pieces that you need to include are `print_for_robot`, which you need to set to `TRUE`, `output_directory` which defaults to your working directory, but you can pass along a string to indicate where to place the output file, and `output_filename`, which you can use to name your output file, (default is "robot_dilution_file _YYYY_MM_DD.csv" -- NOTE: you do not need to include the ".csv" file extension in the name you provide). 
+
+```{r robot_dilution_example, echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+samples_dilution <- dilution_calculation(data_table = sample_dna_combined, concentration_column = "DNA_Concentration", target_concentration = 2, maximum_sample_volume = 30, maximum_volume = 200, print_for_robot = TRUE, output_directory = "/path/to/some/directory", output_filename = 'my_dilution_for_robot')
+
+```
+
+If you look, you will notice that the format of the output file is not the same as the data table returned. This is not a bug, but done in order to play nicely with the software from the robot. The dilutions are calculated in the same way, and the output of this function in R is simply a bit more human-readable.
+
+As a side note, it is important that your input data table have two columns to indicate where samples are coming from. One is "PlateID" which gives each individual source plate a unique name, and the other is "SampleWell", which gives each sample a location within each source plate. You will get an error if your input data table does not include this information. This is important because you can use this function to help dilute many samples at a time, across several sample plates. In fact, the order in which the data table is inputted will be the order in which samples are (re-)arrayed into plates that have your desired concentraiton. So if you want to combine 192 samples from four different plates into two new plates, you can do so at the same time as you dilute your samples.
+
+### Using Beckmann liquid-handling robot to evenly pool samples
+Another helpful way to use the Beckmann robot is to perform even pooling of samples (e.g. library prep PCR products). To do this, you can use the `robot_equal_combine()` function, which is very similar to the `dilution_calculation()` function in reverse. This function was primarily designed to pool a 384-well plate into as few wells as possible in a deep-well 96 well plate. If you are using a different set up, you will need to change some of the default behaviors so that you do not pipet volumes that are too large or pipet from a 384 well format when you have our DNA in a 96 well plate. 
+
+We'll get to how to use the function in a little bit, but first it is worth walking through generating the right data to input into the function, since it can get complicated to work with 384 well plates when we use a 96-well plate to quantify DNA.
+
+In the example below, a 384-well plate has been quantified using four 96-well plates corresponding to each of the four quadrants of the 384 well plate. Once we quantify our four DNA plates, we can combine them using a 'shortcut' that is very helpful in joining many tables together without nesting a lot of join functions inside of each other:
 
 
-### Metagenomics sequencing prep
-DNA concentration
-Normalize
-Pool evenly
+```{r pooling_example_quantification, echo=TRUE, message=FALSE, warning=FALSE}
+
+# Quantify 4 DNA plates and add sample information
+
+plate_1_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_1_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 10, plate_size = 96, plate_name = 'PCR_Plate1', print_standard_curve = F)
+plate_1_info <- read_sample_info(file_path = 'Example_pcr_1_map.csv')
+plate_1_data <- full_join(plate_1_quantification, plate_1_info)
+
+plate_2_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_2_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 10, plate_size = 96, plate_name = 'PCR_Plate2', print_standard_curve = F)
+plate_2_info <- read_sample_info(file_path = 'Example_pcr_2_map.csv')
+plate_2_data <- full_join(plate_2_quantification, plate_2_info)
+
+
+plate_3_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_3_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 10, plate_size = 96, plate_name = 'PCR_Plate3', print_standard_curve = F)
+plate_3_info <- read_sample_info(file_path = 'Example_pcr_3_map.csv')
+plate_3_data <- full_join(plate_3_quantification, plate_3_info)
+
+
+plate_4_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_4_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 10, plate_size = 96, plate_name = 'PCR_Plate4', print_standard_curve = F)
+plate_4_info <- read_sample_info(file_path = 'Example_pcr_4_map.csv')
+plate_4_data <- full_join(plate_4_quantification, plate_4_info)
+
+# Combine all four data sets - this is a shortcut to combine many data tables together using the "full_join" function
+
+combined_pcr_samples <- Reduce(function(df1,df2) {dplyr::full_join(df1, df2)}, list(plate_1_data, plate_2_data, plate_3_data, plate_4_data))
+
+```
+
+This joined data set looks like: 
+
+
+```{r view_quantified_pcr_products, echo=FALSE, message=FALSE, warning=FALSE}
+kable(combined_pcr_samples) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+Note that the PlateID and SampleWell columns still refer to the PlateID and SampleWell of the 96-well plates we used to quantify the samples, and not the PlateID and SampleWell of the original 384 well plate. To help us navigate between these two and maintain the correct sample locations for each sample, we can use the `plate_mapping_96_384` data table (that is loaded with the package) to help map 384-well quadrants to 96-well plates. This table looks like:
+
+
+```{r view_384_96_map, echo=FALSE, message=FALSE, warning=FALSE}
+kable(plate_mapping_96_384) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+We will be able to use this table to extract the correct well location for our samples in the 384 well plate, but we first need to extract the plate number from our data set. We have this information in our PlateID column, (but also in the BarcodePlate column that we provided). 
+
+```{r prep_for_merge_pcr_quantification_with_well_map, echo=TRUE, message=FALSE, warning=FALSE}
+combined_pcr_samples_384_locations <- combined_pcr_samples %>% 
+  mutate(Plate_96 = as.integer(substring(BarcodePlate, 6, 6)),
+         Well_96 = SampleWell)
+
+```
+
+Now, we will be able to combine this data table with our 384-to-96-well mapping table:
+
+```{r merge_pcr_quantification_with_well_map, echo=TRUE, message=FALSE, warning=FALSE}
+combined_pcr_samples_384 <- left_join(combined_pcr_samples_384_locations, plate_mapping_96_384) %>% 
+  mutate(PlateID = "PCR_384_Plate", SampleWell = Well_384)
+
+```
+
+
+You can also see thath I've taken the opportunity here to go ahead and written over the PlateID and SampleWell columns so that they now correspond to the 384-well plate and locations (which is what we need for the pooling function). 
+
+Now, we can finally use the `robot_equal_combine()` function. There are a couple of nice features to this function that helps perform the pooling step efficiently, that are reflected in the arguments passed to the function:
+
+* *dataset* input data table (e.g. DNA quantification of PCR products) - must contain a couple of columns (BarcodeID, PlateID, SampleWell, and DNA_Concentration)
+* *min_volume* minimum volume of sample to combine (default = 1.5) - this is helpful if you want to change the smallest volume to be pipetted by the robot - typically 1 uL is good to be robust to errors.
+* *max_volume* maximum volume of sample to combine (default = 6) - this is helpful so that you do not take all of your sample, or so that you do not try to pool more than the amount of sample you actually have remaining.
+* *number_of_pools* number of different pools to create (default = "Auto" which creates as few as possible while maintaining each pool under the maximum pool size)
+* *maximum_pool_size* maximum volume of any one pool
+* *starting_plate_size* size of plate to pool from (384 or 96); NOTE: default is 384.
+
+
+```{r pool_pcr_quantification, echo=TRUE, message=TRUE, warning=FALSE}
+pooling_table <- robot_equal_combine(dataset = combined_pcr_samples_384, min_volume = 1, max_volume = 12, number_of_pools = "Auto", maximum_pool_size = 500, starting_plate_size = 384)
+
+```
+
+The function will give you a message in the command line that indicates how the pooling is happening (how many output wells, their volumes, the total pooled volume, the approximate amount of DNA pooled from each sample, and the names of the plates needed to perform the pooling).
+
+And just like the `dilution_calculation()` function, we can optionally decide to print this table to be used directly with the robot. To do so, we need to provide the same additional arguments as for the dilution function:
+
+* *print_for_robot* TRUE/FALSE to indicate whether or not a file should be made to be used with the robot (default = FALSE)
+* *output_directory* directory to save file for use with the robot print_for_robot must be TRUE (default = working directory)
+* *output_filename* filename for output file. If none is given, default will be "robot_pooling_file_YYYY_MM_DD.csv". It is not necessary to provide the '.csv' extension.
+
+```{r pool_pcr_quantification_printed, echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+pooling_table <- robot_equal_combine(dataset = combined_pcr_samples_384, min_volume = 1, max_volume = 12, number_of_pools = "Auto", maximum_pool_size = 500, starting_plate_size = 384, print_for_robot = TRUE, output_directory = "/path/to/some/directory", output_filename = 'my_pooling_for_robot')')
+
+```
+
+### Other helpful functions for manipulating data
+
+#### Sequencing Indexes
+There are a couple of other helpful components of this package that can be useful. For one, I have included a couple of data tables to help keep track of samples for sequecning. For one, the data tables `index_mapping_16S` and `index_mapping_metagenomics` provide the sequencing indexes for the 16S and metagenomics library preps, and where they are located (Plate and Well). 
+
+```{r call_View_16S_index,  echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+View(index_mapping_16S)
+
+```
+
+
+```{r view_16S_index, echo=FALSE, message=FALSE, warning=FALSE}
+kable(index_mapping_16S) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+
+```{r call_View_metagenomics_index, echo=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+View(index_mapping_metagenomics)
+
+```
+
+
+```{r view_metagenomics_index, echo=FALSE, message=FALSE, warning=FALSE}
+kable(index_mapping_metagenomics) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+
+These are very helpful in building a sequencing mapping file for further analysis.
+
+There are also a couple of functions that are used within the functions described above that can be useful on their own if you need them.
+
+#### Converting between well names and numbers
+
+`well_parser()` helps go from a well location (e.g. "B07") to a well number. This is helpful since the Beckman robot only accepts well numbers and not locations. It is designed to handle well locations in 96 and 384 well formats:
+
+```{r well_parser_demo, echo=TRUE, message=TRUE, warning=FALSE}
+well_parser(well = "B03", size = 96)
+
+well_parser(well = "B03", size = 384)
+
+```
+
+`well_number_to_location()` performs the opposite transformation, and turns a well number into a location. This helps go back from a robot-friendly notation to a human-friendly notation:
+
+```{r well_number_to_location_demo, echo=TRUE, message=TRUE, warning=FALSE}
+well_number_to_location(well_number = 84, size = 96)
+
+well_number_to_location(well_number = 84, size = 384)
+
+```
+
+#### Using the matrix rack 96-barcode scanner
+
+`matrix_plate_parser()` helps take the output from the Cho Lab matrix rack barcode scanner and build a data frame in R. The input can either be the .csv output from the plate scanner software or the .xls output. This function can handle either format.
+
+```{r matrix_plate_parser_demo, echo=FALSE, message=TRUE, warning=FALSE}
+sample_plate_scan <- matrix_plate_parser(matrix_barcode_plate_scan = 'Example_matrix_plate_scan.csv', plate_name = 'Test_Plate')
+
+```
+
+
+```{r view_plate_scan, echo=FALSE, message=FALSE, warning=FALSE}
+kable(sample_plate_scan) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
 

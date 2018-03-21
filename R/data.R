@@ -8,15 +8,6 @@
 #' @name Example_BR_samples_raw
 "Example_BR_samples_raw"
 
-#' Mapping file for the plate containing Broad-Range dye standard curve
-#'
-#' A dataset that contains the information from a mapping, and is used to re-create a template mapping file. This data is used in the sample_file_maker script to generate a sample mapping file. This dataset contains an example of how to include standards for a standard curve
-#'
-#' @docType data
-#' @format A table with 96 rows and 10 columns
-#' @source Generated in lab for the purposes of analyzing this type of data
-#' @name Example_BR_standard_mapping
-"Example_BR_standard_mapping"
 
 #' Raw Fluorescence data for the plate measured with High-Sensitivity dye
 #'
@@ -27,16 +18,6 @@
 #' @source Generated in lab.
 #' @name Example_HS_samples_raw
 "Example_HS_samples_raw"
-
-#' Mapping file for the plate containing High-Sensitivity dye standard curve
-#'
-#' A dataset that contains the information from a mapping, and is used to re-create a template mapping file. This data is used in the sample_file_maker script to generate a sample mapping file. This dataset contains an example of how to include standards for a standard curve
-#'
-#' @docType data
-#' @format A table with 96 rows and 10 columns
-#' @source Generated in lab for the purposes of analyzing this type of data
-#' @name Example_HS_standard_mapping
-"Example_HS_standard_mapping"
 
 
 #' Empty tube weight file
@@ -90,7 +71,7 @@
 #' @docType data
 #' @format This data is not in a standard format since it is simply the data read in directly from a .csv file.
 #' @source Generated in lab.
-#' @name Example_tandards_raw
+#' @name Example_standards_raw
 "Example_standards_raw"
 
 
@@ -145,3 +126,93 @@
 #' @source Generated for helping shift between 4x96-well and 384-well plate formats
 #' @name plate_mapping_96_384
 "plate_mapping_96_384"
+
+#' Raw Fluorescence data for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the information from a plate reader file, and is used to re-create a raw fluorescence file as if it came from the plate reader. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .xls file.
+#' @source Generated in lab.
+#' @name Example_pcr_1_data
+"Example_pcr_1_data"
+
+#' Raw Fluorescence data for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the information from a plate reader file, and is used to re-create a raw fluorescence file as if it came from the plate reader. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .xls file.
+#' @source Generated in lab.
+#' @name Example_pcr_2_data
+"Example_pcr_2_data"
+
+#' Raw Fluorescence data for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the information from a plate reader file, and is used to re-create a raw fluorescence file as if it came from the plate reader. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .xls file.
+#' @source Generated in lab.
+#' @name Example_pcr_3_data
+"Example_pcr_3_data"
+
+#' Raw Fluorescence data for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the information from a plate reader file, and is used to re-create a raw fluorescence file as if it came from the plate reader. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .xls file.
+#' @source Generated in lab.
+#' @name Example_pcr_4_data
+"Example_pcr_4_data"
+
+#' Raw Fluorescence data for the plate containing pcr product quantification standards
+#'
+#' A dataset that contains the information from a plate reader file, and is used to re-create a raw fluorescence file as if it came from the plate reader. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .xls file.
+#' @source Generated in lab.
+#' @name Example_pcr_stds_data
+"Example_pcr_stds_data"
+
+#' Mapping file for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the mapping file for a pcr product quantification. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .csv file.
+#' @source Generated in lab.
+#' @name Example_pcr_1_map
+"Example_pcr_1_map"
+
+#' Mapping file for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the mapping file for a pcr product quantification. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .csv file.
+#' @source Generated in lab.
+#' @name Example_pcr_2_map
+"Example_pcr_2_map"
+
+#' Mapping file for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the mapping file for a pcr product quantification. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .csv file.
+#' @source Generated in lab.
+#' @name Example_pcr_3_map
+"Example_pcr_3_map"
+
+#' Mapping file for the plate containing pcr product quantifications
+#'
+#' A dataset that contains the mapping file for a pcr product quantification. This data is used in the sample_file_maker script to generate sample raw files.
+#'
+#' @docType data
+#' @format This data is not in a standard format since it is simply the data read in directly from a .csv file.
+#' @source Generated in lab.
+#' @name Example_pcr_4_map
+"Example_pcr_4_map"

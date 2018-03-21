@@ -29,11 +29,11 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
   plate <- read_plate(plate_reader_file = plate_reader_file, size = plate_size, plate_name = plate_name)
 
   standard_data <- read_plate(plate_reader_file = standards_plate_reader_file, size = plate_size) %>%
-    dplyr::filter(Well %in% standard_wells)
+    dplyr::filter(SampleWell %in% standard_wells)
 
-  standard_data$`DNA in Standard` <- standard_values
+  standard_data$DNA_in_Standard <- standard_values
 
-  standard_curve <- stats::lm(standard_data$`DNA in Standard` ~ standard_data$Measurement)
+  standard_curve <- stats::lm(standard_data$DNA_in_Standard ~ standard_data$Measurement)
 
   scale_x <- standard_curve$coefficients[2]
   intercept <- standard_curve$coefficients[1]
@@ -44,11 +44,10 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
                                                                                                                  round(rsquared, 5)), sep = "\n")
 
   name <- paste0(plate_name, "_", dye_used, "_", "Standard Curve.pdf")
-  standards_plot <- ggplot2::ggplot(data = standard_data, ggplot2::aes_string(x = "Measurement", y = "`DNA in Standard`")) +
+  standards_plot <- ggplot2::ggplot(data = standard_data, ggplot2::aes_string(x = "Measurement", y = "DNA_in_Standard")) +
     ggplot2::geom_point(size = 4) + ggplot2::labs(x = "Measurement", y = "ug DNA in Standard", main = "Standard Curve") +
     ggplot2::geom_smooth(method = "lm", se = FALSE) +
-    ggplot2::annotate("text", x = 0, y = max(standard_data$`DNA in Standard`), hjust = 0, label = standards_info) + ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(size = 18, angle = 0, hjust = 0.5, color = "black"))
+    ggplot2::annotate("text", x = 0, y = max(standard_data$DNA_in_Standard), hjust = 0, label = standards_info) + faith_lab_theme(plot_size = 'big')
 
   if (print_standard_curve == TRUE) {
     cowplot::save_plot(filename = name, plot = standards_plot, base_height = 6, base_width = 6)
@@ -58,15 +57,15 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
   message(paste0("Standards Information:\nLine of best fit: Y = ", round(scale_x, 5), "* X ", round(intercept, 5), "\nR^2 = ", round(rsquared, 5)))
 
   sample_data <- plate %>%
-    dplyr::mutate(`Qubit Volume` = qubit_volume,
-                  `DNA Concentration (ng/uL)` = (Measurement * scale_x + intercept)/qubit_volume,
-                  `Elution Volume` = elution_volume,
-                  `Total DNA (ug)` = `DNA Concentration (ng/uL)` * elution_volume / 1000,
-                  Plate = plate_name) %>%
-    dplyr::select(Plate, dplyr::everything())
+    dplyr::mutate(Qubit_Volume = qubit_volume,
+                  DNA_Concentration = (Measurement * scale_x + intercept)/qubit_volume,
+                  Elution_Volume = elution_volume,
+                  Total_DNA = DNA_Concentration * elution_volume / 1000,
+                  PlateID = plate_name) %>%
+    dplyr::select(PlateID, dplyr::everything())
 
   if (standards_plate_reader_file == plate_reader_file) {
-    sample_data <- sample_data %>% dplyr::filter(!(Well %in% standard_wells))
+    sample_data <- sample_data %>% dplyr::filter(!(SampleWell %in% standard_wells))
   }
 
   return(sample_data)

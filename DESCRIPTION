@@ -11,6 +11,8 @@ Depends:
   tidyverse
 Imports:
   dplyr,
+  plyr,
+  pander,
   readr,
   ggplot2,
   stringr,

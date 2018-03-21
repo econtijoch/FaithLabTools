@@ -22,8 +22,8 @@ mass_and_order <-
     for (column in 1:length(empty_parser)) {
       empty_parser[[column]] <- class(empty[[column]])[[1]]
       if (empty_parser[[column]] == 'hms') {
-        empty_parser[[column]] <- "Empty Weight Time"
-        empty_parser[[column - 1]] <- "Empty Weight Date"
+        empty_parser[[column]] <- "Empty_Weight_Time"
+        empty_parser[[column - 1]] <- "Empty_Weight_Date"
 
 	  } else if (empty_parser[[column]] == 'character') {
 
@@ -45,7 +45,7 @@ mass_and_order <-
           empty_parser[[column]] <- paste0("Column.", column)
         }
       } else if (empty_parser[[column]] == 'numeric') {
-        empty_parser[[column]] <- 'Empty Mass'
+        empty_parser[[column]] <- 'Empty_Mass'
       } else if (empty_parser[[column]] == 'integer') {
 		  if (8 < log10(empty[[column]][[1]]) & log10(empty[[column]][[1]]) <= 10) {
 			  empty_parser[[column]] <- 'TubeBarcode'
@@ -71,8 +71,8 @@ mass_and_order <-
     for (column in 1:length(full_parser)) {
       full_parser[[column]] <- class(full[[column]])[[1]]
       if (full_parser[[column]] == 'hms') {
-        full_parser[[column]] <- "Full Weight Time"
-        full_parser[[column - 1]] <- "Full Weight Date"
+        full_parser[[column]] <- "Full_Weight_Time"
+        full_parser[[column - 1]] <- "Full_Weight_Date"
       } else if (full_parser[[column]] == 'character') {
           if (stringr::str_length(full[[column]][[1]]) == 10) {
   			if ('TubeBarcode' %in% full_parser) {
@@ -90,7 +90,7 @@ mass_and_order <-
           full_parser[[column]] <- paste0("Column.", column)
         }
       } else if (full_parser[[column]] == 'numeric') {
-        full_parser[[column]] <- 'Full Mass'
+        full_parser[[column]] <- 'Full_Mass'
       } else if (full_parser[[column]] == 'integer') {
 		  if (8 < log10(full[[column]][[1]]) & log10(empty[[column]][[1]]) <= 10) {
 			  full_parser[[column]] <- 'TubeBarcode'
@@ -114,17 +114,17 @@ mass_and_order <-
       if ('TubeBarcode' %in% colnames(full) &
           'TubeBarcode' %in% colnames(empty)) {
         sample_mass <-
-          dplyr::left_join(full, empty, by = 'TubeBarcode') %>% dplyr::mutate(SampleMass = `Full Mass` - `Empty Mass`)
+          dplyr::left_join(full, empty, by = 'TubeBarcode') %>% dplyr::mutate(SampleMass = Full_Mass - Empty_Mass)
       } else if ('BarcodeID' %in% colnames(full) &
                  'BarcodeID' %in% colnames(empty)) {
         sample_mass <-
-          dplyr::left_join(full, empty, by = 'BarcodeID') %>% dplyr::mutate(SampleMass = `Full Mass` - `Empty Mass`)
+          dplyr::left_join(full, empty, by = 'BarcodeID') %>% dplyr::mutate(SampleMass = Full_Mass - Empty_Mass)
       } else {
         stop("Error finding TubeBarcode or BarcodeID in one or both input files")
       }
 
       output <-
-        dplyr::left_join(tube_order, sample_mass, by = 'TubeBarcode') %>% dplyr::mutate(Well = paste0(stringr::str_sub(Well,1, 1), sprintf(as.integer(stringr::str_sub(Well, 2, -1L)) , fmt = '%02.0f')))
+        dplyr::left_join(tube_order, sample_mass, by = 'TubeBarcode') %>% dplyr::mutate(SampleWell = paste0(stringr::str_sub(SampleWell,1, 1), sprintf(as.integer(stringr::str_sub(SampleWell, 2, -1L)) , fmt = '%02.0f')))
 
 
     } else {
@@ -132,24 +132,24 @@ mass_and_order <-
       if ('TubeBarcode' %in% colnames(full) &
           'TubeBarcode' %in% colnames(empty)) {
         output <-
-          dplyr::left_join(full, empty, by = 'TubeBarcode') %>% dplyr::mutate(SampleMass = `Full Mass` - `Empty Mass`)
+          dplyr::left_join(full, empty, by = 'TubeBarcode') %>% dplyr::mutate(SampleMass = Full_Mass - Empty_Mass)
       } else if ('BarcodeID' %in% colnames(full) &
                  'BarcodeID' %in% colnames(empty)) {
         output <-
-          dplyr::left_join(full, empty, by = 'BarcodeID') %>% dplyr::mutate(SampleMass = `Full Mass` - `Empty Mass`)
+          dplyr::left_join(full, empty, by = 'BarcodeID') %>% dplyr::mutate(SampleMass = Full_Mass - Empty_Mass)
       } else {
         stop("Error finding TubeBarcode or BarcodeID in one or both input files")
       }
     }
 
     # Handle cases where some tubes were not weighed beforehand - use average weight of empty tubes
-    if (sum(is.na(output[, "Empty Mass"])) > 0) {
-      output[is.na(output$`Empty Mass`), "Empty Weight Date"] <-
+    if (sum(is.na(output[, "Empty_Mass"])) > 0) {
+      output[is.na(output$Empty_Mass), "Empty_Weight_Date"] <-
         "[WARNING]: Tube not weighed empty. Using average empty tube weight instead."
-      output[is.na(output$`Empty Mass`), "Empty Mass"] <-
-        mean(output$`Empty Mass`, na.rm = TRUE)
+      output[is.na(output$Empty_Mass), "Empty_Mass"] <-
+        mean(output$Empty_Mass, na.rm = TRUE)
       output <-
-        output %>% dplyr::mutate(SampleMass = `Full Mass` - `Empty Mass`)
+        output %>% dplyr::mutate(SampleMass = Full_Mass - Empty_Mass)
     }
 
     return(output)

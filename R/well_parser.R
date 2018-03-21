@@ -8,7 +8,7 @@
 well_parser <- function(well, size = 96) {
   row <- substring(well, 1, 1)
   column <- as.numeric(substring(well, 2, 3))
-  num_row <- grep(pattern = row, LETTERS)
+  num_row <- match(row, LETTERS)
   if (size == 96) {
     output <- 12 * (num_row - 1) + column
   } else if (size == 384) {
