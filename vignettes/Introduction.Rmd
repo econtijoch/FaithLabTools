@@ -126,7 +126,7 @@ If you have a file that contains more sample information that what is contained 
 ```{r add_sample_info, echo=TRUE, message=FALSE, warning=FALSE}
 sample_information <- read_sample_info('Example_sampleInfo.csv')
 
-annotated_data <- left_join(sample_weights_and_location, sample_information)
+annotated_data <- left_join(sample_weights_and_location, sample_information) %>% mutate(ReaderWell = SampleWell)
 
 ```
 
@@ -199,7 +199,7 @@ If you are measuring the same sample with both the BR and HS dyes, you may want 
 By doing this, we try to keep the DNA concentration measurements in the more reliable ranges of the Qubit dyes.
 
 ```{r qubit_merger, echo=TRUE, message=FALSE, warning=FALSE}
-sample_dna_combined <- qubit_merger(hs_data = sample_HS_dna, br_data = sample_BR_dna)
+sample_dna_combined <- qubit_merger(hs_data = sample_HS_dna, br_data = sample_BR_dna) %>% mutate(SampleWell = ReaderWell)
 
 
 ```
@@ -301,7 +301,7 @@ If you look, you will notice that the format of the output file is not the same 
 
 As a side note, it is important that your input data table have two columns to indicate where samples are coming from. One is "PlateID" which gives each individual source plate a unique name, and the other is "SampleWell", which gives each sample a location within each source plate. You will get an error if your input data table does not include this information. This is important because you can use this function to help dilute many samples at a time, across several sample plates. In fact, the order in which the data table is inputted will be the order in which samples are (re-)arrayed into plates that have your desired concentraiton. So if you want to combine 192 samples from four different plates into two new plates, you can do so at the same time as you dilute your samples.
 
-It is important to point out here that although it is often the case that ReaderWell = SampleWell, SampleWell may not necessarily correspond to ReaderWell. ReaderWell is meant to indicate the location of a plate reader measurement, while SampleWell is meant to indicate the physical location of the source DNA. In this way, there is flexibility to measure DNA from multiple plates on the same plate reader measurement. This may be the source of some confusion, but it is why I recommend creating a mapping file that can help bridge the gap between where a sample is actually located (SampleWell) and where it was measured (ReadeWell), if these are different. If they are the same, you can simply copy this information with `new_data <- data %>% mutate(SampleWell = ReaderWell)`. 
+It is important to point out here that although it is often the case that ReaderWell = SampleWell, SampleWell may not necessarily correspond to ReaderWell. ReaderWell is meant to indicate the location of a plate reader measurement, while SampleWell is meant to indicate the physical location of the source DNA. In this way, there is flexibility to measure DNA from multiple plates on the same plate reader measurement. This may be the source of some confusion, but it is why I recommend creating a mapping file that can help bridge the gap between where a sample is actually located (SampleWell) and where it was measured (ReadeWell), if these are different. If they are the same, you can simply copy this information with `new_data <- data %>% mutate(SampleWell = ReaderWell)`, as has been done in the examples above. Otherwise, this information should be contained elsewhere.
 
 ## Using Beckmann liquid-handling robot to evenly pool samples
 Another helpful way to use the Beckmann robot is to perform even pooling of samples (e.g. library prep PCR products). To do this, you can use the `robot_equal_combine()` function, which is very similar to the `dilution_calculation()` function in reverse. This function was primarily designed to pool a 384-well plate into as few wells as possible in a deep-well 96 well plate. If you are using a different set up, you will need to change some of the default behaviors so that you do not pipet volumes that are too large or pipet from a 384 well format when you have our DNA in a 96 well plate. 
