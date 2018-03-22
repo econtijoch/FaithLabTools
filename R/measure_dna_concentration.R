@@ -61,8 +61,8 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
                   DNA_Concentration = (Measurement * scale_x + intercept)/qubit_volume,
                   Elution_Volume = elution_volume,
                   Total_DNA = DNA_Concentration * elution_volume / 1000,
-                  PlateID = plate_name) %>%
-    dplyr::select(PlateID, dplyr::everything())
+                  ReaderPlate = plate_name) %>%
+    dplyr::select(ReaderPlate, ReaderWell, dplyr::everything())
 
   if (standards_plate_reader_file == plate_reader_file) {
     sample_data <- sample_data %>% dplyr::filter(!(ReaderWell %in% standard_wells))
