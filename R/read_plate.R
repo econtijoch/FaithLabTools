@@ -63,8 +63,8 @@ read_plate <- function(plate_reader_file, size = 96, plate_name = NA) {
 
   # Remove NAs
   final_table <- subset(newtable, !is.na(newtable$Measurement)) %>%
-    dplyr::mutate(PlateID = plate_name, SampleWell = Well) %>%
-    dplyr::select(PlateID, SampleWell, Measurement)
+    dplyr::mutate(PlateID = plate_name, ReaderWell = Well) %>%
+    dplyr::select(PlateID, ReaderWell, Measurement)
 
   return(final_table)
 

@@ -29,7 +29,7 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
   plate <- read_plate(plate_reader_file = plate_reader_file, size = plate_size, plate_name = plate_name)
 
   standard_data <- read_plate(plate_reader_file = standards_plate_reader_file, size = plate_size) %>%
-    dplyr::filter(SampleWell %in% standard_wells)
+    dplyr::filter(ReaderWell %in% standard_wells)
 
   standard_data$DNA_in_Standard <- standard_values
 
@@ -65,7 +65,7 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
     dplyr::select(PlateID, dplyr::everything())
 
   if (standards_plate_reader_file == plate_reader_file) {
-    sample_data <- sample_data %>% dplyr::filter(!(SampleWell %in% standard_wells))
+    sample_data <- sample_data %>% dplyr::filter(!(ReaderWell %in% standard_wells))
   }
 
   return(sample_data)

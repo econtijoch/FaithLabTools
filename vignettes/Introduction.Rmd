@@ -216,7 +216,7 @@ kable(sample_dna_combined) %>%
 ## Joining, filtering, and computing new columns
 To demonstrate a couple of examples of how to filter rows from your table, and how to add new columns to your data, I'll walk through a "manual" version of computing microbiota density from samples. All of the pieces are in place if you follow the functions outlined above, we just need to do some division, and clean up our data.
 
-The DNA measurement functions will produce a table containing DNA concentrations based on all the samples in the plate that are not standards (so either 88 or 96 samples, for most uses). If there are wells that were empty, they will be carried over using these functions. To eliminate them, we can filter out individual wells using something like `filtered_table <- filter(unfiltered_table, !(Well %in% c("F11", "F12", "G04")))`. We can employ a variation of this to filter our samples based on some of the fields in our annotated sample information above. If you have used the Matrix plate scanner, you can simply filter out any samples that have a "No Tube" in the TubeBarcode field. Another filter that you can use commonly is to remove any samples whose mass is less than 10 mg. These are often empty tubes, or samples for which the fecal sample was too small, and so any errors in the DNA extraction are exacerbated when you calculate things like microbiota density.
+The DNA measurement functions will produce a table containing DNA concentrations based on all the samples in the plate that are not standards (so either 88 or 96 samples, for most uses). If there are wells that were empty, they will be carried over using these functions. To eliminate them, we can filter out individual wells using something like `filtered_table <- filter(unfiltered_table, !(SampleWell %in% c("F11", "F12", "G04")))`. We can employ a variation of this to filter our samples based on some of the fields in our annotated sample information above. If you have used the Matrix plate scanner, you can simply filter out any samples that have a "No Tube" in the TubeBarcode field. Another filter that you can use commonly is to remove any samples whose mass is less than 10 mg. These are often empty tubes, or samples for which the fecal sample was too small, and so any errors in the DNA extraction are exacerbated when you calculate things like microbiota density.
 
 As a side note, I use the pipe function (\%>\%) from the [magrittr](http://r4ds.had.co.nz/pipes.html) package that really helps make the code much more readable by passing along the results of any computations/data performed on the left of the pipe to the functions to the right of the pipe.
 
@@ -301,6 +301,8 @@ If you look, you will notice that the format of the output file is not the same 
 
 As a side note, it is important that your input data table have two columns to indicate where samples are coming from. One is "PlateID" which gives each individual source plate a unique name, and the other is "SampleWell", which gives each sample a location within each source plate. You will get an error if your input data table does not include this information. This is important because you can use this function to help dilute many samples at a time, across several sample plates. In fact, the order in which the data table is inputted will be the order in which samples are (re-)arrayed into plates that have your desired concentraiton. So if you want to combine 192 samples from four different plates into two new plates, you can do so at the same time as you dilute your samples.
 
+It is important to point out here that although it is often the case that ReaderWell = SampleWell, SampleWell may not necessarily correspond to ReaderWell. ReaderWell is meant to indicate the location of a plate reader measurement, while SampleWell is meant to indicate the physical location of the source DNA. In this way, there is flexibility to measure DNA from multiple plates on the same plate reader measurement. This may be the source of some confusion, but it is why I recommend creating a mapping file that can help bridge the gap between where a sample is actually located (SampleWell) and where it was measured (ReadeWell), if these are different. If they are the same, you can simply copy this information with `new_data <- data %>% mutate(SampleWell = ReaderWell)`. 
+
 ## Using Beckmann liquid-handling robot to evenly pool samples
 Another helpful way to use the Beckmann robot is to perform even pooling of samples (e.g. library prep PCR products). To do this, you can use the `robot_equal_combine()` function, which is very similar to the `dilution_calculation()` function in reverse. This function was primarily designed to pool a 384-well plate into as few wells as possible in a deep-well 96 well plate. If you are using a different set up, you will need to change some of the default behaviors so that you do not pipet volumes that are too large or pipet from a 384 well format when you have our DNA in a 96 well plate. 
 
@@ -314,21 +316,21 @@ In the example below, a 384-well plate has been quantified using four 96-well pl
 # Quantify 4 DNA plates and add sample information
 
 plate_1_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_1_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 20, plate_size = 96, plate_name = 'PCR_Plate1', print_standard_curve = F)
-plate_1_info <- read_sample_info(file_path = 'Example_pcr_1_map.csv')
+plate_1_info <- read_sample_info(file_path = 'Example_pcr_1_map.csv') %>% mutate(ReaderWell = SampleWell)
 plate_1_data <- full_join(plate_1_quantification, plate_1_info)
 
 plate_2_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_2_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 20, plate_size = 96, plate_name = 'PCR_Plate2', print_standard_curve = F)
-plate_2_info <- read_sample_info(file_path = 'Example_pcr_2_map.csv')
+plate_2_info <- read_sample_info(file_path = 'Example_pcr_2_map.csv') %>% mutate(ReaderWell = SampleWell)
 plate_2_data <- full_join(plate_2_quantification, plate_2_info)
 
 
 plate_3_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_3_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 20, plate_size = 96, plate_name = 'PCR_Plate3', print_standard_curve = F)
-plate_3_info <- read_sample_info(file_path = 'Example_pcr_3_map.csv')
+plate_3_info <- read_sample_info(file_path = 'Example_pcr_3_map.csv') %>% mutate(ReaderWell = SampleWell)
 plate_3_data <- full_join(plate_3_quantification, plate_3_info)
 
 
 plate_4_quantification <- measure_dna_concentration(plate_reader_file = 'Example_pcr_4_data.xlsx', standards_plate_reader_file = 'Example_pcr_stds_data.xlsx', standard_wells = c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"), dye_used = "HS", qubit_volume = 2, elution_volume = 20, plate_size = 96, plate_name = 'PCR_Plate4', print_standard_curve = F)
-plate_4_info <- read_sample_info(file_path = 'Example_pcr_4_map.csv')
+plate_4_info <- read_sample_info(file_path = 'Example_pcr_4_map.csv') %>% mutate(ReaderWell = SampleWell)
 plate_4_data <- full_join(plate_4_quantification, plate_4_info)
 
 # Combine all four data sets - this is a shortcut to combine many data tables together using the "full_join" function
