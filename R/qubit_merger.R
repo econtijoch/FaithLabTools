@@ -8,8 +8,8 @@
 
 
 qubit_merger <- function(hs_data, br_data) {
-  hs_data_long <- hs_data %>% dplyr::mutate_(HS_Measurement = "Measurement", HS_dna_concentration = "DNA_Concentration") %>% dplyr::select_("-Measurement", "-DNA_Concentration", "-Total_DNA", "-Qubit_Volume")
-  br_data_long <- br_data  %>% dplyr::mutate_(BR_Measurement = "Measurement", BR_dna_concentration = "DNA_Concentration") %>% dplyr::select_("-Measurement", "-DNA_Concentration", "-Total_DNA", "-Qubit_Volume")
+  hs_data_long <- hs_data %>% dplyr::mutate_(HS_Measurement = "Measurement", HS_dna_concentration = "DNA_Concentration") %>% dplyr::select_("-Measurement", "-DNA_Concentration", "-Total_DNA", "-Qubit_Volume", "-ReaderPlate")
+  br_data_long <- br_data  %>% dplyr::mutate_(BR_Measurement = "Measurement", BR_dna_concentration = "DNA_Concentration") %>% dplyr::select_("-Measurement", "-DNA_Concentration", "-Total_DNA", "-Qubit_Volume", "-ReaderPlate")
 
   combined_data <- dplyr::full_join(hs_data_long, br_data_long)
 

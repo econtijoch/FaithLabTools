@@ -13,7 +13,7 @@ matrix_plate_parser <- function(matrix_barcode_plate_scan, plate_name = NA) {
       readr::read_csv(
         matrix_barcode_plate_scan,
         skip = 0
-      ) %>% dplyr::mutate(SampleWell = paste0(LocationRow, sprintf(LocationColumn, fmt = '%02.0f')), TubeBarcode = TubeCode, PlateID = ifelse(is.na(plate_name), RackID, plate_name)) %>% dplyr::select(PlateID, SampleWell, TubeBarcode)
+      ) %>% dplyr::mutate(SampleWell = paste0(LocationRow, sprintf(as.numeric(LocationColumn), fmt = '%02.0f')), TubeBarcode = TubeCode, PlateID = ifelse(is.na(plate_name), RackID, plate_name)) %>% dplyr::select(PlateID, SampleWell, TubeBarcode)
   } else if (utils::tail(unlist(strsplit(matrix_barcode_plate_scan, "\\.")), n = 1) == "xls" |
              utils::tail(unlist(strsplit(matrix_barcode_plate_scan,
                                          "\\.")), n = 1) == "xlsx") {
