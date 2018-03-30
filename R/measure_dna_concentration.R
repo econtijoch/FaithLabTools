@@ -31,7 +31,7 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
   standard_data <- read_plate(plate_reader_file = standards_plate_reader_file, size = plate_size) %>%
     dplyr::filter(ReaderWell %in% standard_wells)
 
-  standard_data$DNA_in_Standard <- standard_values
+  standard_data$DNA_in_Standard <- standard_values[1:length(standard_wells)]
 
   standard_curve <- stats::lm(standard_data$DNA_in_Standard ~ standard_data$Measurement)
 
