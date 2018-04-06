@@ -20,6 +20,8 @@ Imports:
   cowplot,
   readxl,
   writexl,
+  xml2,
+  rvest,
   ggbeeswarm
 Suggests: knitr,
     rmarkdown,

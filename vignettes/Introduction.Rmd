@@ -199,7 +199,7 @@ If you are measuring the same sample with both the BR and HS dyes, you may want 
 By doing this, we try to keep the DNA concentration measurements in the more reliable ranges of the Qubit dyes.
 
 ```{r qubit_merger, echo=TRUE, message=FALSE, warning=FALSE}
-sample_dna_combined <- qubit_merger(hs_data = sample_HS_dna, br_data = sample_BR_dna) %>% mutate(PlateID = ReaderPlate, SampleWell = ReaderWell)
+sample_dna_combined <- qubit_merger(hs_data = sample_HS_dna, br_data = sample_BR_dna) %>% mutate(PlateID = 'Example Plate', SampleWell = ReaderWell)
 
 
 ```
@@ -476,6 +476,22 @@ sample_plate_scan <- matrix_plate_parser(matrix_barcode_plate_scan = 'Example_ma
 
 ```{r view_plate_scan, echo=FALSE, message=FALSE, warning=FALSE}
 kable(sample_plate_scan) %>% 
+  kable_styling() %>%
+  scroll_box(height = '300px')
+
+```
+
+
+### Reading in data from Bruker biotyper
+Another helpful function included is a quick way of reading in the output from the Bruker biotyper into a data table, `read_bruker_file()`:
+
+```{r bruker_biotyper_demo, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+sample_bruker_table <- read_bruker_file(bruker_html_file = 'Example_Bruker_File.html')
+```
+
+
+```{r view_bruker_table, echo=FALSE, message=FALSE, warning=FALSE}
+kable(sample_bruker_table) %>% 
   kable_styling() %>%
   scroll_box(height = '300px')
 

@@ -24,6 +24,7 @@ make_example_files <- function(directory = getwd()) {
   utils::data('Example_pcr_2_map')
   utils::data('Example_pcr_3_map')
   utils::data('Example_pcr_4_map')
+  utils::data('Example_Bruker_biotyper_html_file')
 
 
   starting <- getwd()
@@ -43,6 +44,7 @@ make_example_files <- function(directory = getwd()) {
   writexl::write_xlsx(x = Example_pcr_3_data, path = paste(directory, "Example_pcr_3_data.xlsx", sep = "/"))
   writexl::write_xlsx(x = Example_pcr_4_data, path = paste(directory, "Example_pcr_4_data.xlsx", sep = "/"))
   writexl::write_xlsx(x = Example_pcr_stds_data, path = paste(directory, "Example_pcr_stds_data.xlsx", sep = "/"))
+
   # Make .csv files
   readr::write_csv(Example_mapping_file, path = paste(directory, "Example_mapping.csv", sep = "/"))
   readr::write_csv(Example_sample_info, path = paste(directory, "Example_sampleInfo.csv", sep = "/"))
@@ -53,10 +55,11 @@ make_example_files <- function(directory = getwd()) {
   readr::write_csv(Example_pcr_3_map, path = paste(directory, "Example_pcr_3_map.csv", sep = "/"))
   readr::write_csv(Example_pcr_4_map, path = paste(directory, "Example_pcr_4_map.csv", sep = "/"))
 
-
   # Make .txt files
   readr::write_delim(Example_empty_weights, path = paste(directory, "Example_empty_weights.txt", sep = "/"), delim = '\t', col_names = F)
   readr::write_delim(Example_full_weights, path = paste(directory, "Example_full_weights.txt", sep = "/"), delim = '\t', col_names = F)
 
+  # Make .html file
+  readr::write_file(x = Example_Bruker_biotyper_html_file, path = paste(directory, "Example_Bruker_File.html", sep = "/"))
   setwd(starting)
 }

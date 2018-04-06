@@ -216,3 +216,13 @@
 #' @source Generated in lab.
 #' @name Example_pcr_4_map
 "Example_pcr_4_map"
+
+#' Bruker Biotyper sample output html file
+#'
+#' HTML file output from bruker biotyper
+#'
+#' @docType data
+#' @format HTML file
+#' @source Generated in lab.
+#' @name Example_Bruker_biotyper_html_file
+"Example_Bruker_biotyper_html_file"
