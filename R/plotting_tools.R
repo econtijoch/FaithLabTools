@@ -11,7 +11,7 @@ faith_lab_theme <- function(plot_size = 'small', base_family = 'sans', base_rect
 								 base_line_size = 1.5
 							 } else {
  							 	base_size =  6
- 	                            base_line_size = 1
+ 	                            base_line_size = 0.25
 							 }
   half_line <- base_size / 2
   ggplot2::theme(
@@ -92,7 +92,7 @@ faith_lab_theme_tilted <- function(plot_size = 'small', base_family = 'sans', ba
 								 base_line_size = 1.5
 							 } else {
  							 	base_size =  6
- 	                            base_line_size = 1
+ 	                            base_line_size = 0.25
 							 }
 
   half_line <- base_size / 2
