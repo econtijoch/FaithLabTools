@@ -16,7 +16,7 @@
 #'
 
 
-measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_file = plate_reader_file, standard_wells, dye_used, qubit_volume = 2, elution_volume = 100, plate_size = 96, plate_name = "DNA_Plate", print_standard_curve = FALSE) {
+measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_file = plate_reader_file, standard_wells, dye_used, qubit_volume = 2, elution_volume = 100, plate_size = 96, plate_name = "DNA_Plate", print_standard_curve = FALSE, omit_standards = NULL) {
 
   if (dye_used == "HS") {
     standard_values <- c(0, 5, 10, 20, 40, 60, 80, 100)
@@ -32,6 +32,10 @@ measure_dna_concentration <- function(plate_reader_file, standards_plate_reader_
     dplyr::filter(ReaderWell %in% standard_wells)
 
   standard_data$DNA_in_Standard <- standard_values[1:length(standard_wells)]
+
+  if (!is.null(omit_standards)) {
+    standard_data <- standard_data %>% dplyr::filter(!(ReaderWell %in% omit_standards))
+  }
 
   standard_curve <- stats::lm(standard_data$DNA_in_Standard ~ standard_data$Measurement)
 
