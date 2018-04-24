@@ -7,14 +7,15 @@
 measure_dna_concentration(plate_reader_file,
   standards_plate_reader_file = plate_reader_file, standard_wells, dye_used,
   qubit_volume = 2, elution_volume = 100, plate_size = 96,
-  plate_name = "DNA_Plate", print_standard_curve = FALSE)
+  plate_name = "DNA_Plate", print_standard_curve = FALSE,
+  omit_standards = NULL)
 }
 \arguments{
 \item{plate_reader_file}{relative location to relevant plate reader file (accepts excel files)}
 
 \item{standards_plate_reader_file}{relative location to the plate reader file containing the standards (if it is the same as the plate you want to quantify, it is not necessary to explicitly specify}
 
-\item{standard_wells}{a vector containing the wells that contain the standards in increasing concentration (e.g. c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"))}
+\item{standard_wells}{a vector containing the wells that contain the standards in increasing concentration (e.g. c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08")) - needs to be sequential. If you need to exclude any standards, use omit_standards}
 
 \item{dye_used}{"BR" or "HS" to specify quantification with HS or BR dye}
 
@@ -27,6 +28,8 @@ measure_dna_concentration(plate_reader_file,
 \item{plate_name}{name to give plate (helps when using multiple plates)}
 
 \item{print_standard_curve}{TRUE or FALSE to indicate whether or not to save a .pdf image containing the standard curve}
+
+\item{omit_standards}{pass along a well location to exclude from standard analysis (helpful for when one fails)}
 }
 \value{
 table with DNA concentrations for each sample, given the input parameters

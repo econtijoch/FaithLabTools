@@ -3,13 +3,14 @@
 #'
 #' @param plate_reader_file relative location to relevant plate reader file (accepts excel files)
 #' @param standards_plate_reader_file relative location to the plate reader file containing the standards (if it is the same as the plate you want to quantify, it is not necessary to explicitly specify
-#' @param standard_wells a vector containing the wells that contain the standards in increasing concentration (e.g. c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08"))
+#' @param standard_wells a vector containing the wells that contain the standards in increasing concentration (e.g. c("A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08")) - needs to be sequential. If you need to exclude any standards, use omit_standards
 #' @param dye_used "BR" or "HS" to specify quantification with HS or BR dye
 #' @param qubit_volume volume of sample used for quantification (default = 2)
 #' @param elution_volume volume of your sample (used to compute total DNA in sample, default = 100)
 #' @param plate_size size of plate (default = 96, alternative is 384 - not tested yet)
 #' @param plate_name name to give plate (helps when using multiple plates)
 #' @param print_standard_curve TRUE or FALSE to indicate whether or not to save a .pdf image containing the standard curve
+#' @param omit_standards pass along a well location to exclude from standard analysis (helpful for when one fails)
 #'
 #' @return table with DNA concentrations for each sample, given the input parameters
 #' @export
