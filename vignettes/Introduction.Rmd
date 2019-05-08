@@ -1,5 +1,5 @@
 ---
-title: "Introduction to FaithLabTools"
+title: "Introduction to FaithLabTools R Package"
 author: "Eduardo Contijoch"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -249,7 +249,7 @@ If you notice, the microbiota density measurement here is the total DNA from the
 As a general note, if you want to create or access columns with "nice" names (e.g. with spaces, descriptions, etc), you can use the \` character to denote the column name. This is used above to create the "Microbiota Density (ug DNA per mg feces)" column. If you want to create simple column names that do not include spaces or special characters, you do not need to wrap your column name in the \` character. It is often much easier to use and access simpler column names, but for clarity and ease of use outside of R, it may make sense in to use complicated column names.
 
 ## Plotting data
-I've also put together a couple of functions to help with plotting data. They consist of a couple of plot themes (`faith_lab_theme()` and `faith_lab_theme_tilted()`), and one function to plot the mean $\pm$ standard error of the mean of grouped data (`geom_mean_sem()`). The plotting themes meant for slides simply make the font sizes and lines bigger by default. The plots made for papers makes the font sizes small, so that figures can be made to be approximately 2 inches by 2 inches and useable with minimal tweaking. I've also included here a color pallete that I find to be a bit easier to work with than the default colors from ggplot (`EJC_colors()`). The following plotting example shows a lot of these pieces in action.
+I've also put together a couple of functions to help with plotting data. They consist of a couple of plot themes (`faith_lab_theme()` and `faith_lab_theme_tilted()`), one function to plot the mean $\pm$ standard error of the mean of grouped data (`geom_mean_sem()`), and one function to plot the raw data plus the median (`geom_median()`). The plotting themes meant for slides simply make the font sizes and lines bigger by default. The plots made for papers makes the font sizes small, so that figures can be made to be approximately 2 inches by 2 inches and useable with minimal tweaking. I've also included here a color pallete that I find to be a bit easier to work with than the default colors from ggplot (`EJC_colors()`). The following plotting example shows a lot of these pieces in action.
 
 ```{r plotting_intro, echo=TRUE, fig.height=4, fig.width=8, message=FALSE, warning=FALSE}
 
@@ -261,13 +261,16 @@ plotting_data <- microbiota_density_data %>%
 
 sample_plot <- ggplot(data = plotting_data, aes(x = Condition, y = `Microbiota Density (ug DNA per mg feces)`, shape = CageAnimal, color = Cage)) + geom_mean_sem(point.size = 2, line.size = 0.5) + faith_lab_theme_tilted() + scale_color_manual(values = EJC_colors)
 
+sample_plot_median <- ggplot(data = plotting_data, aes(x = Condition, y = `Microbiota Density (ug DNA per mg feces)`, shape = CageAnimal, color = Cage)) + geom_median(point.size = 2, line.size = 0.5) + faith_lab_theme_tilted() + scale_color_manual(values = EJC_colors)
+
 print(sample_plot)
+print(sample_plot_median)
 
 ```
 
 There's a lot going on in that plot, but briefly, I first manipulated the data a little to make the data be a bit more plotting-friendly. I removed samples that were not fecal pellets, and then created a column for the individual animals in each of the cages (a, b, and c) so that I could plot those points as different shapes in the final plot. Lastly, I shuffled the order of the values of the "Condition" column using a helper function `level_reorder()`. This function takes a vector of factors and re-orders the levels of the factor. It is important that the names of the levels match the existing levels exactly.
 
-The `geom_mean_sem()` function now can handle shapes and color groupings of variables, and you can change the size of the line and point sizes by assigning a new value to `point.size` and `line.size` within the `geom_mean_sem()`.
+The `geom_mean_sem()` and `geom_median()` functions now can handle shapes and color groupings of variables, and you can change the size of the line and point sizes by assigning a new value to `point.size` and `line.size` within the `geom_mean_sem()`.
 
 By default, the plotting themes `faith_lab_theme()` and `faith_lab_theme_tilted()` produce plots that are meant to be relatively small (for printing, papers, etc.). If you would like to make plots that are more readily adapted to larger formats such as powerpoint slides or posters, you can pass an argument to the function: `faith_lab_theme(plot_size = 'big')`. 
 
