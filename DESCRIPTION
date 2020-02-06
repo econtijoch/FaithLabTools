@@ -22,9 +22,9 @@ Imports:
   writexl,
   xml2,
   rvest,
-  ggbeeswarm
-Suggests: knitr,
-    rmarkdown,
-    kableExtra
+  ggbeeswarm,
+  knitr,
+  rmarkdown,
+  kableExtra
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
