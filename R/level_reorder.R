@@ -3,7 +3,7 @@
 #' @param vector vector to reorder
 #' @param order order of reordered factor levels
 #'
-#' @return reoredered factor
+#' @return reordered factor
 #' @export
 #'
 level_reorder <- function(vector, order) {
